@@ -17,6 +17,7 @@ const CHAR FailedError[] = " failed: error code ";
 
 const CHAR FilesDirectory[] = "\nMake sure the Files directory is present and all files are closed and writable\n";
 #define FILES_DIRECTORY_LENGTH 80
+#define ONLY_NEWLINE_LENGTH    1
 
 const CHAR NumberOfFiles[] = "Number of files decoded: ";
 #define NUMBER_OF_FILES_LENGTH 25
@@ -120,18 +121,18 @@ VOID Ransom_DecryptFile(CHAR* lpFileName, CHAR* a2, CHAR* a3)
 // sub_401160 : Ransom_PrintTotal
 VOID Ransom_PrintTotal(INT TotalFiles)
 {
-    DWORD v1; // eax
-    char Buffer[12]; // [esp+0h] [ebp-10h] BYREF
-    DWORD nNumberOfCharsToWrite; // [esp+Ch] [ebp-4h]
-
-    Ransom_IntToStr(TotalFiles, Buffer);
+    DWORD NumberLength;
+    char NumberBuffer[12];
+    DWORD nNumberOfCharsToWrite;
+    
+    Ransom_IntToStr(TotalFiles, NumberBuffer);
     WriteConsoleA(hConsoleOutput, NumberOfFiles, NUMBER_OF_FILES_LENGTH, NULL, NULL);
-    v1 = strlen(Buffer);
-    WriteConsoleA(hConsoleOutput, Buffer, v1, NULL, NULL);
+    NumberLength = strlen(NumberBuffer);
+    WriteConsoleA(hConsoleOutput, NumberBuffer, NumberLength, NULL, NULL);
     if (TotalFiles)
-        nNumberOfCharsToWrite = 1;
+        nNumberOfCharsToWrite = ONLY_NEWLINE_LENGTH;
     else
-        nNumberOfCharsToWrite = 80;
+        nNumberOfCharsToWrite = FILES_DIRECTORY_LENGTH;
     WriteConsoleA(hConsoleOutput, FilesDirectory, nNumberOfCharsToWrite, NULL, NULL);
 }
 
