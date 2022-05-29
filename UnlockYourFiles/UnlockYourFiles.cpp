@@ -27,13 +27,14 @@ HANDLE hConsoleOutput;
 CHAR PathName[] = "Files";
 CHAR FileName[] = "*.encrypted";
 
-CHAR* sub_401070(unsigned int a1, CHAR* a2)
+// sub_401070 : Ransom_IntToStr
+CHAR* Ransom_IntToStr(INT Value, CHAR* Destination)
 {
-    if (a1 >= 0xA)
-        a2 = (CHAR*)sub_401070(a1 / 0xA, a2);
-    *a2 = a1 % 0xA + 48;
-    a2[1] = 0;
-    return a2 + 1;
+    if (Value >= 10)
+        Destination = (CHAR*)Ransom_IntToStr(Value / 10, Destination);
+    Destination[0] = Value % 10 + '0';
+    Destination[1] = 0;
+    return Destination + 1;
 }
 
 // sub_4010C0 : Ransom_HandleError
@@ -45,7 +46,7 @@ void Ransom_HandleError(const CHAR* lpBuffer)
     char Buffer[12]; // [esp+0h] [ebp-Ch] BYREF
 
     LastError = GetLastError();
-    sub_401070(LastError, Buffer);
+    Ransom_IntToStr(LastError, Buffer);
     v2 = strlen(lpBuffer);
     WriteConsoleA(hConsoleOutput, lpBuffer, v2, NULL, NULL);
     WriteConsoleA(hConsoleOutput, FailedError, FAILED_ERROR_LENGTH, NULL, NULL);
@@ -123,7 +124,7 @@ VOID Ransom_PrintTotal(INT TotalFiles)
     char Buffer[12]; // [esp+0h] [ebp-10h] BYREF
     DWORD nNumberOfCharsToWrite; // [esp+Ch] [ebp-4h]
 
-    sub_401070(TotalFiles, Buffer);
+    Ransom_IntToStr(TotalFiles, Buffer);
     WriteConsoleA(hConsoleOutput, NumberOfFiles, NUMBER_OF_FILES_LENGTH, NULL, NULL);
     v1 = strlen(Buffer);
     WriteConsoleA(hConsoleOutput, Buffer, v1, NULL, NULL);
