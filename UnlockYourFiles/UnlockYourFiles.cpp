@@ -55,14 +55,15 @@ void Ransom_HandleError(const CHAR* lpBuffer)
     ExitProcess(1u);
 }
 
-int sub_401030(CHAR* a1, CHAR* a2)
+// sub_401030: Ransom_StrCpy
+int Ransom_StrCpy(CHAR* Destination, CHAR* Source)
 {
     int i;
 
     for (i = 0; ; ++i)
     {
-        a1[i] = a2[i];
-        if (!a2[i])
+        Destination[i] = Source[i];
+        if (!Source[i])
             break;
     }
     return i;
@@ -81,7 +82,8 @@ char sub_4011F0(CHAR* a1, CHAR* a2)
     return result;
 }
 
-VOID sub_401220(CHAR* lpFileName, CHAR* a2, CHAR* a3)
+// sub_401220 : Ransom_DecryptFile
+VOID Ransom_DecryptFile(CHAR* lpFileName, CHAR* a2, CHAR* a3)
 {
     CHAR Buffer[8]; // [esp+0h] [ebp-18h] BYREF
     DWORD NumberOfBytesWritten; // [esp+8h] [ebp-10h] BYREF
@@ -114,17 +116,18 @@ VOID sub_401220(CHAR* lpFileName, CHAR* a2, CHAR* a3)
     WriteConsoleA(hConsoleOutput, a2, NumberOfBytesRead - 9, NULL, NULL);
 }
 
-VOID sub_401160(unsigned int a1)
+// sub_401160 : Ransom_PrintTotal
+VOID Ransom_PrintTotal(INT TotalFiles)
 {
     DWORD v1; // eax
     char Buffer[12]; // [esp+0h] [ebp-10h] BYREF
     DWORD nNumberOfCharsToWrite; // [esp+Ch] [ebp-4h]
 
-    sub_401070(a1, Buffer);
+    sub_401070(TotalFiles, Buffer);
     WriteConsoleA(hConsoleOutput, NumberOfFiles, NUMBER_OF_FILES_LENGTH, NULL, NULL);
     v1 = strlen(Buffer);
     WriteConsoleA(hConsoleOutput, Buffer, v1, NULL, NULL);
-    if (a1)
+    if (TotalFiles)
         nNumberOfCharsToWrite = 1;
     else
         nNumberOfCharsToWrite = 80;
@@ -133,29 +136,38 @@ VOID sub_401160(unsigned int a1)
 
 // sub_401370 : Ransom_DecryptFiles
 BOOL Ransom_DecryptFiles(CHAR Key[8]) {
-    struct _WIN32_FIND_DATAA FindFileData; // [esp+0h] [ebp-190h] BYREF
-    CHAR v3[64]; // [esp+140h] [ebp-50h] BYREF
-    int v4; // [esp+180h] [ebp-10h]
-    HANDLE hFindFile; // [esp+188h] [ebp-8h]
-    int v6; // [esp+18Ch] [ebp-4h]
+    struct _WIN32_FIND_DATAA FindFileData;
+    CHAR cFileName[64];
+    INT FileNameLength;
+    HANDLE hFindFile;
+    INT TotalFiles;
 
-    v6 = 0;
+    TotalFiles = 0;
+    //Change current directory to the Files directory
     if (!SetCurrentDirectoryA(PathName))
         Ransom_HandleError("SetCurrentDirectory(\"Files\")");
+    //Get the first encrypted file having the extension .encrypted
     hFindFile = FindFirstFileA(FileName, &FindFileData);
+    //Check if we got invalid handle
     if (hFindFile == INVALID_HANDLE_VALUE)
         Ransom_HandleError("FindFirstFile");
     do
     {
-        v4 = sub_401030(v3, FindFileData.cFileName);
-        FindFileData.cAlternateFileName[v4 + 6] = 0;
-        sub_401220(FindFileData.cFileName, v3, Key);
-        ++v6;
+        //Copy file name to the local buffer and return the length of the file name
+        FileNameLength = Ransom_StrCpy(cFileName, FindFileData.cFileName);
+        FindFileData.cAlternateFileName[FileNameLength + 6] = 0;
+        //Decrypt one file to the new file name using the specified key
+        Ransom_DecryptFile(FindFileData.cFileName, cFileName, Key);
+        //Increment file total
+        ++TotalFiles;
     } while (FindNextFileA(hFindFile, &FindFileData));
+    //Check if we don't have anymore files
     if (GetLastError() != ERROR_NO_MORE_FILES)
         Ransom_HandleError("FindNextFile");
-    sub_401160(v6);
-    return v6 != 0;
+    //Print the total of the files
+    Ransom_PrintTotal(TotalFiles);
+    //Return a boolean value indicating if at least one file was decrypted
+    return TotalFiles != 0;
 }
 
 // start @ 00401460 : main
