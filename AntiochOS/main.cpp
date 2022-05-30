@@ -78,38 +78,38 @@ __int64 __fastcall sub_401A10(unsigned int a1, __int64 a2, __int64 a3)
 }
 
 // sub_401340 : Anti_GetQuitString
-void Anti_GetQuitString(unsigned char* a1)
+void Anti_GetQuitString(unsigned char* Output)
 {
-    a1[0] = 'q'; // 113
-    a1[1] = 'u'; // 117
-    a1[2] = 'i'; // 105
-    a1[3] = 't'; // 116
-    a1[4] = '\n'; // 10
-    a1[5] = '\0'; // 0
+    Output[0] = 'q'; // 113
+    Output[1] = 'u'; // 117
+    Output[2] = 'i'; // 105
+    Output[3] = 't'; // 116
+    Output[4] = '\n'; // 10
+    Output[5] = '\0'; // 0
 }
 
 // sub_401AB0 : Anti_StrCmp
-char Anti_StrCmp(unsigned char* a1, unsigned char* a2, int a3)
+char Anti_StrCmp(unsigned char* Source, unsigned char* Destination, int Length)
 {
-    long v3; // rax
-    char v4; // cl
+    int i;
+    char val;
 
-    if (!a3)
-        return 0LL;
-    v3 = 0LL;
+    if (!Length)
+        return 0;
+    i = 0;
     while (1)
     {
-        v4 = a1[v3];
-        if (v4 != a2[v3])
+        val = Source[i];
+        if (val != Destination[i])
             break;
-        if (v4)
+        if (val)
         {
-            if (a3 != ++v3)
+            if (Length != ++i)
                 continue;
         }
-        return 0LL;
+        return 0;
     }
-    return 1LL;
+    return 1;
 }
 
 void sub_401360(unsigned char* a1)
