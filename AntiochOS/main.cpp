@@ -30,20 +30,39 @@ unsigned char* Anti_GetVersion()
     return &Version[1];
 }
 
-/*
-int sub_401980(int a1, unsigned int a2, unsigned char* a3, int a4)
+// sub_401980 : Anti_Syscall
+int Anti_Syscall(int a1, unsigned int a2, unsigned char* a3, int a4)
 {
     long result; // rax
 
+    //https://man7.org/linux/man-pages/man2/syscall.2.html
+    //Arch/ABI      arg1  arg2  arg3  arg4  arg5  arg6  arg7  Notes
+    //x86-64        rdi   rsi   rdx   r10   r8    r9    -
+    // 
+    // mov     rax, rdi
+    // mov     rdi, rsi
+    // mov     rsi, rdx
+    // mov     rdx, rcx
+    // mov     r10, r8
+    // mov     r8, r9
+    // syscall; LINUX - sys_open
+    // retn
+    
     result = a1;
-    __asm { syscall; LINUX - sys_open }
+    //__asm { syscall; LINUX - sys_open }
     return result;
 }
-*/
 
-void sub_4019F0(unsigned int a1, unsigned char* a2, int a3)
+// sub_4019F0 : Anti_Write
+int Anti_Write(int fd, const void* buf, size_t count)
 {
-    sub_401980(1, a1, a2, a3);
+    return Anti_Syscall(stdout, fd, buf, count);
+}
+
+// sub_401A10 : Anti_Read
+int Anti_Read(int fd, const void* buf, size_t count)
+{
+    return Anti_Syscall(stdin, fd, buf, count);
 }
 
 // sub_4012E0 : Anti_GetTypeHelpMessage
@@ -70,11 +89,6 @@ void Anti_GetTypeHelpMessage(unsigned char* Output)
     Output[17] = 'p'; // 112
     Output[18] = '\n'; // 10
     Output[19] = '\0'; // 0
-}
-
-__int64 __fastcall sub_401A10(unsigned int a1, __int64 a2, __int64 a3)
-{
-    return (int)sub_401980(0LL, a1, a2, a3);
 }
 
 // sub_401340 : Anti_GetQuitString
@@ -294,13 +308,13 @@ __int64 sub_401420()
     __int64 v0; // rax
 
     v0 = sub_4010A0();
-    sub_4019F0(1u, v0, 42LL);
-    return sub_4019F0(1u, (__int64)"...AAARGH\n\n", 11LL);
+    Anti_Write(1u, v0, 42LL);
+    return Anti_Write(1u, (__int64)"...AAARGH\n\n", 11LL);
 }
 
 __int64 __fastcall sub_401A90(unsigned int a1, __int64 a2, __int64 a3, __int64 a4)
 {
-    return sub_401980(60LL, a1, a3, a4);
+    return Anti_Syscall(60LL, a1, a3, a4);
 }
 
 int main()
@@ -310,14 +324,14 @@ int main()
   __int16 v3[76]; // [rsp+20h] [rbp-98h] BYREF
 
   v0 = Anti_GetVersion();
-  sub_4019F0(1LL, v0, 37LL);
+  Anti_Write(1LL, v0, 37LL);
   Anti_GetTypeHelpMessage(v3);
-  sub_4019F0(1LL, v3, 19LL);
+  Anti_Write(1LL, v3, 19LL);
   while ( 1 )
   {
     v3[0] = 8254;
-    sub_4019F0(1LL, v3, 2LL);
-    if ( !sub_401A10(0LL, v3, 128LL) )
+    Anti_Write(1LL, v3, 2LL);
+    if ( !Anti_Read(0LL, v3, 128LL) )
       break;
     Anti_GetQuitString(v2);
     if ( !(unsigned int)Anti_StrCmp(v3, v2, 5LL) )
