@@ -30,33 +30,46 @@ unsigned char* Anti_GetVersion()
     return &Version[1];
 }
 
-__int64 __fastcall sub_4019F0(unsigned int a1, __int64 a2, __int64 a3)
+/*
+int sub_401980(int a1, unsigned int a2, unsigned char* a3, int a4)
 {
-    return (int)sub_401980(1LL, a1, a2, a3);
+    long result; // rax
+
+    result = a1;
+    __asm { syscall; LINUX - sys_open }
+    return result;
+}
+*/
+
+void sub_4019F0(unsigned int a1, unsigned char* a2, int a3)
+{
+    sub_401980(1, a1, a2, a3);
 }
 
-void __fastcall sub_4012E0(_BYTE* a1)
+// sub_4012E0 : Anti_GetTypeHelpMessage
+void Anti_GetTypeHelpMessage(unsigned char* Output)
 {
-    *a1 = 84;
-    a1[1] = 121;
-    a1[2] = 112;
-    a1[3] = 101;
-    a1[4] = 32;
-    a1[5] = 104;
-    a1[6] = 101;
-    a1[7] = 108;
-    a1[8] = 112;
-    a1[9] = 32;
-    a1[10] = 102;
-    a1[11] = 111;
-    a1[12] = 114;
-    a1[13] = 32;
-    a1[14] = 104;
-    a1[15] = 101;
-    a1[16] = 108;
-    a1[17] = 112;
-    a1[18] = 10;
-    a1[19] = 0;
+    //Type help for help
+    Output[0] = 'T'; // 84
+    Output[1] = 'y'; // 121
+    Output[2] = 'p'; // 112
+    Output[3] = 'e'; // 101
+    Output[4] = ' '; // 32
+    Output[5] = 'h'; // 104
+    Output[6] = 'e'; // 101
+    Output[7] = 'l'; // 108
+    Output[8] = 'p'; // 112
+    Output[9] = ' '; // 32
+    Output[10] = 'f'; // 102
+    Output[11] = 'o'; // 111
+    Output[12] = 'r'; // 114
+    Output[13] = ' '; // 32
+    Output[14] = 'h'; // 104
+    Output[15] = 'e'; // 101
+    Output[16] = 'l'; // 108
+    Output[17] = 'p'; // 112
+    Output[18] = '\n'; // 10
+    Output[19] = '\0'; // 0
 }
 
 __int64 __fastcall sub_401A10(unsigned int a1, __int64 a2, __int64 a3)
@@ -64,19 +77,21 @@ __int64 __fastcall sub_401A10(unsigned int a1, __int64 a2, __int64 a3)
     return (int)sub_401980(0LL, a1, a2, a3);
 }
 
-void __fastcall sub_401340(_BYTE* a1)
+// sub_401340 : Anti_GetQuitString
+void Anti_GetQuitString(unsigned char* a1)
 {
-    *a1 = 113;
-    a1[1] = 117;
-    a1[2] = 105;
-    a1[3] = 116;
-    a1[4] = 10;
-    a1[5] = 0;
+    a1[0] = 'q'; // 113
+    a1[1] = 'u'; // 117
+    a1[2] = 'i'; // 105
+    a1[3] = 't'; // 116
+    a1[4] = '\n'; // 10
+    a1[5] = '\0'; // 0
 }
 
-__int64 __fastcall sub_401AB0(__int64 a1, __int64 a2, __int64 a3)
+// sub_401AB0 : Anti_StrCmp
+char Anti_StrCmp(unsigned char* a1, unsigned char* a2, int a3)
 {
-    __int64 v3; // rax
+    long v3; // rax
     char v4; // cl
 
     if (!a3)
@@ -84,8 +99,8 @@ __int64 __fastcall sub_401AB0(__int64 a1, __int64 a2, __int64 a3)
     v3 = 0LL;
     while (1)
     {
-        v4 = *(_BYTE*)(a1 + v3);
-        if (v4 != *(_BYTE*)(a2 + v3))
+        v4 = a1[v3];
+        if (v4 != a2[v3])
             break;
         if (v4)
         {
@@ -97,9 +112,9 @@ __int64 __fastcall sub_401AB0(__int64 a1, __int64 a2, __int64 a3)
     return 1LL;
 }
 
-void __fastcall sub_401360(_BYTE* a1)
+void sub_401360(unsigned char* a1)
 {
-    *a1 = 104;
+    a1[0] = 104;
     a1[1] = 101;
     a1[2] = 108;
     a1[3] = 112;
@@ -107,9 +122,9 @@ void __fastcall sub_401360(_BYTE* a1)
     a1[5] = 0;
 }
 
-void __fastcall sub_401380(_BYTE* a1)
+void sub_401380(unsigned char* a1)
 {
-    *a1 = 99;
+    a1[0] = 99;
     a1[1] = 111;
     a1[2] = 110;
     a1[3] = 115;
@@ -120,9 +135,9 @@ void __fastcall sub_401380(_BYTE* a1)
     a1[8] = 0;
 }
 
-void __fastcall sub_4013B0(_BYTE* a1)
+void sub_4013B0(unsigned char* a1)
 {
-    *a1 = 97;
+    a1[0] = 97;
     a1[1] = 112;
     a1[2] = 112;
     a1[3] = 114;
@@ -134,6 +149,7 @@ void __fastcall sub_4013B0(_BYTE* a1)
     a1[9] = 0;
 }
 
+/*
 __int64 sub_401640()
 {
     __int64 v0; // rbx
@@ -194,7 +210,9 @@ __int64 sub_401640()
     }
     return sub_4019F0(1u, (__int64)"...AAARGH\n\n", 11LL);
 }
+*/
 
+/*
 __int64 sub_401460()
 {
     int v0; // r14d
@@ -268,7 +286,8 @@ LABEL_7:
         v11[i] = v7;
     }
     return sub_4019F0(1u, (__int64)v11, 4096LL);
-}
+}*/
+
 
 __int64 sub_401420()
 {
@@ -286,13 +305,13 @@ __int64 __fastcall sub_401A90(unsigned int a1, __int64 a2, __int64 a3, __int64 a
 
 int main()
 {
-  __int64 v0; // rax
+  unsigned char* v0; // rax
   _BYTE v2[32]; // [rsp+0h] [rbp-B8h] BYREF
   __int16 v3[76]; // [rsp+20h] [rbp-98h] BYREF
 
   v0 = Anti_GetVersion();
   sub_4019F0(1LL, v0, 37LL);
-  sub_4012E0(v3);
+  Anti_GetTypeHelpMessage(v3);
   sub_4019F0(1LL, v3, 19LL);
   while ( 1 )
   {
@@ -300,17 +319,17 @@ int main()
     sub_4019F0(1LL, v3, 2LL);
     if ( !sub_401A10(0LL, v3, 128LL) )
       break;
-    sub_401340(v2);
-    if ( !(unsigned int)sub_401AB0(v3, v2, 5LL) )
+    Anti_GetQuitString(v2);
+    if ( !(unsigned int)Anti_StrCmp(v3, v2, 5LL) )
       break;
     sub_401360(v2);
-    if ( (unsigned int)sub_401AB0(v3, v2, 5LL) )
+    if ( (unsigned int)Anti_StrCmp(v3, v2, 5LL) )
     {
       sub_401380(v2);
-      if ( (unsigned int)sub_401AB0(v3, v2, 8LL) )
+      if ( (unsigned int)Anti_StrCmp(v3, v2, 8LL) )
       {
         sub_4013B0(v2);
-        if ( !(unsigned int)sub_401AB0(v3, v2, 9LL) )
+        if ( !(unsigned int)Anti_StrCmp(v3, v2, 9LL) )
           sub_401640();
       }
       else
