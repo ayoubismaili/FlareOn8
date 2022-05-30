@@ -1,12 +1,34 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-unsigned char buf_4040C0[38] = {
+//buf_4040C0
+//.AntiochOS, version 1.32 (build 1975)
+unsigned char Version[38] = {
     0x00, 0xCA, 0xE5, 0xFF, 0xE2, 0xE4, 0xE8, 0xE3, 0xC4, 0xD8, 0xA7, 0xAB,
     0xFD, 0xEE, 0xF9, 0xF8, 0xE2, 0xE4, 0xE5, 0xAB, 0xBA, 0xA5, 0xB8, 0xB9,
     0xAB, 0xA3, 0xE9, 0xFE, 0xE2, 0xE7, 0xEF, 0xAB, 0xBA, 0xB2, 0xBC, 0xBE,
     0xA2, 0x81
 };
+
+// sub_4013E0 : Anti_GetVersion
+unsigned char* Anti_GetVersion()
+{
+    unsigned char val;
+    unsigned char* ptr;
+
+    //The first byte of the string indicates if the string was already decrypted
+    val = Version[0];
+    if (!Version[0])
+    {
+        //Decrypt the string
+        for (ptr = Version; ptr < (Version + 38); val = *ptr)
+        {
+            *ptr++ = val ^ 0x8B;
+        }
+    }
+    //Return the string but skip the first byte
+    return &Version[1];
+}
 
 __int64 __fastcall sub_4019F0(unsigned int a1, __int64 a2, __int64 a3)
 {
@@ -262,31 +284,13 @@ __int64 __fastcall sub_401A90(unsigned int a1, __int64 a2, __int64 a3, __int64 a
     return sub_401980(60LL, a1, a3, a4);
 }
 
-unsigned char *sub_4013E0()
-{
-  unsigned char v0; // dl
-  unsigned char *i; // rax
-
-  v0 = buf_4040C0[0];
-  if (!buf_4040C0[0])
-  {
-    for ( i = buf_4040C0; ; v0 = *i )
-    {
-      *i++ = v0 ^ 0x8B;
-      if ( i == buf_4040C0 + 38 )
-        break;
-    }
-  }
-  return &buf_4040C0[1];
-}
-
 int main()
 {
   __int64 v0; // rax
   _BYTE v2[32]; // [rsp+0h] [rbp-B8h] BYREF
   __int16 v3[76]; // [rsp+20h] [rbp-98h] BYREF
 
-  v0 = sub_4013E0();
+  v0 = Anti_GetVersion();
   sub_4019F0(1LL, v0, 37LL);
   sub_4012E0(v3);
   sub_4019F0(1LL, v3, 19LL);
