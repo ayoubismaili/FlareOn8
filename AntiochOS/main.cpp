@@ -10,15 +10,25 @@ unsigned char Version[38] = {
 	0xA2, 0x81
 };
 
-#define VERSION_STRING_LENGTH  37
-#define TYPE_HELP_STRING_LENGTH 19
-#define APPROACH_STRING_LENGTH 9
-#define CONSULT_STRING_LENGTH  8
-#define HELP_STRING_LENGTH     5
-#define QUIT_STRING_LENGTH     5
-#define PROMPT_STRING_LENGTH   2
+//byte_404020
+//.Approach the Gorge of Eternal Peril!
+unsigned char ApproachGorge[38] = {
+	0x00, 0xDC, 0xED, 0xED, 0xEF, 0xF2, 0xFC, 0xFE, 0xF5, 0xBD, 0xE9, 0xF5,
+	0xF8, 0xBD, 0xDA, 0xF2, 0xEF, 0xFA, 0xF8, 0xBD, 0xF2, 0xFB, 0xBD, 0xD8,
+	0xE9, 0xF8, 0xEF, 0xF3, 0xFC, 0xF1, 0xBD, 0xCD, 0xF8, 0xEF, 0xF4, 0xF1,
+	0xBC, 0x97
+};
 
-#define READ_BUFFER_LENGTH     128
+
+#define VERSION_STRING_LENGTH   37
+#define TYPE_HELP_STRING_LENGTH 19
+#define APPROACH_STRING_LENGTH  9
+#define CONSULT_STRING_LENGTH   8
+#define HELP_STRING_LENGTH      5
+#define QUIT_STRING_LENGTH      5
+#define PROMPT_STRING_LENGTH    2
+
+#define READ_BUFFER_LENGTH      128
 
 // sub_4013E0 : Anti_GetVersion
 unsigned char* Anti_GetVersion()
@@ -38,6 +48,26 @@ unsigned char* Anti_GetVersion()
 	}
 	//Return the string but skip the first byte
 	return &Version[1];
+}
+
+// sub_401260 : Anti_GetApproachGorge
+void* Anti_GetApproachGorge()
+{
+	unsigned char val;
+	unsigned char* ptr;
+
+	//The first byte of the string indicates if the string was already decrypted
+	val = ApproachGorge[0];
+	if (!ApproachGorge[0])
+	{
+		//Decrypt the string
+		for (ptr = ApproachGorge; ptr < (ApproachGorge + 38); val = *ptr)
+		{
+			*ptr++ = val ^ 0x9D;
+		}
+	}
+	//Return the string but skip the first byte
+	return &ApproachGorge[1];
 }
 
 // sub_4012E0 : Anti_GetTypeHelpMessage
@@ -120,6 +150,12 @@ void Anti_GetApproachString(unsigned char* Output)
 	Output[9] = '\0'; // 0
 }
 
+// sub_401120 : Anti_GetWhatIsYourNameString
+void Anti_GetWhatIsYourNameString(unsigned char* Output)
+{
+	strcpy(Output, "What is your name? ");
+}
+
 // sub_401980 : Anti_Syscall
 int Anti_Syscall(int a1, unsigned int a2, unsigned char* a3, int a4)
 {
@@ -146,6 +182,7 @@ int Anti_Syscall(int a1, unsigned int a2, unsigned char* a3, int a4)
 // sub_4019F0 : Anti_Write
 int Anti_Write(int fd, const void* buf, size_t count)
 {
+	//https://blog.rchapman.org/posts/Linux_System_Call_Table_for_x86_64/
 	//https://github.com/torvalds/linux/blob/master/arch/x86/entry/syscalls/syscall_64.tbl
 	//sys_write = 1
 	return Anti_Syscall(1, fd, buf, count);
@@ -154,9 +191,19 @@ int Anti_Write(int fd, const void* buf, size_t count)
 // sub_401A10 : Anti_Read
 int Anti_Read(int fd, const void* buf, size_t count)
 {
+	//https://blog.rchapman.org/posts/Linux_System_Call_Table_for_x86_64/
 	//https://github.com/torvalds/linux/blob/master/arch/x86/entry/syscalls/syscall_64.tbl
 	//sys_read = 0
 	return Anti_Syscall(0, fd, buf, count);
+}
+
+// sub_401A90 : Anti_Exit
+int Anti_Exit(int error_code)
+{
+	//https://blog.rchapman.org/posts/Linux_System_Call_Table_for_x86_64/
+	//https://github.com/torvalds/linux/blob/master/arch/x86/entry/syscalls/syscall_64.tbl
+	//sys_exit = 60
+	return Anti_Syscall(60, error_code, 0, 0);
 }
 
 // sub_401AB0 : Anti_StrCmp
@@ -183,8 +230,17 @@ char Anti_StrCmp(unsigned char* Source, unsigned char* Destination, int Length)
 	return 1;
 }
 
-/*
-__int64 sub_401640()
+// sub_401A50 : Anti_Select
+int Anti_Select(int value)
+{
+	//https://blog.rchapman.org/posts/Linux_System_Call_Table_for_x86_64/
+	//https://github.com/torvalds/linux/blob/master/arch/x86/entry/syscalls/syscall_64.tbl
+	//sys_select = 23
+	return Anti_Syscall(23, 0, 0, 0);
+}
+
+// sub_401640 : Anti_Approach
+void sub_401640()
 {
 	__int64 v0; // rbx
 	__int64 v1; // rax
@@ -203,11 +259,11 @@ __int64 sub_401640()
 
 	v0 = 0LL;
 	v12 = 10;
-	v1 = sub_401260();
-	sub_4019F0(1u, v1, 37LL);
-	sub_401A50(1LL);
-	sub_401120(v13);
-	sub_4019F0(1u, (__int64)v13, 19LL);
+	v1 = Anti_GetApproachGorge();
+	Anti_Write(stdout, v1, 37);
+	Anti_Select(1);
+	Anti_GetWhatIsYourNameString(v13);
+	Anti_Write(stdout, (__int64)v13, 19LL);
 	v2 = sub_401A10(0, (__int64)v14, 128LL);
 	v3 = sub_401B50(v14, v2);
 	v4 = (int*)&unk_40200C;
@@ -215,17 +271,19 @@ __int64 sub_401640()
 	while (v5 != v3)
 	{
 		v0 = (unsigned int)(v0 + 1);
-		if ((_DWORD)v0 == 30)
-			return sub_4019F0(1u, (__int64)"...AAARGH\n\n", 11LL);
+		if ((_DWORD)val == 30) {
+			Anti_Write(stdout, (__int64)"...AAARGH\n\n", 11LL);
+			return;
+		}
 		v5 = *v4;
 		v4 += 3;
 	}
 	sub_401180(v13, v2, v4);
-	sub_4019F0(1u, (__int64)v13, 20LL);
+	Anti_Write(stdout, (__int64)v13, 20LL);
 	if (sub_401A10(0, (__int64)v14, 128LL) > 1)
 	{
 		sub_4011E0(v13);
-		sub_4019F0(1u, (__int64)v13, 29LL);
+		Anti_Write(stdout, (__int64)v13, 29LL);
 		v6 = sub_401A10(0, (__int64)v14, 128LL);
 		v7 = sub_401B50(v14, v6);
 		v8 = (char*)&unk_402000 + 12 * v0;
@@ -236,15 +294,15 @@ __int64 sub_401640()
 			{
 				sub_401AF0((unsigned int)v9, v14);
 				v10 = sub_4012A0();
-				sub_4019F0(1u, v10, 20LL);
-				sub_4019F0(1u, (__int64)v14, strlen(v14));
-				return sub_4019F0(1u, (__int64)&v12, 1LL);
+				Anti_Write(stdout, v10, 20LL);
+				Anti_Write(stdout, (__int64)v14, strlen(v14));
+				Anti_Write(stdout, (__int64)&v12, 1LL);
+				return;
 			}
 		}
 	}
-	return sub_4019F0(1u, (__int64)"...AAARGH\n\n", 11LL);
+	Anti_Write(stdout, "...AAARGH\n\n", 11);
 }
-*/
 
 /*
 __int64 sub_401460()
@@ -332,16 +390,11 @@ __int64 sub_401420()
 	return Anti_Write(1u, (__int64)"...AAARGH\n\n", 11LL);
 }
 
-__int64 __fastcall sub_401A90(unsigned int a1, __int64 a2, __int64 a3, __int64 a4)
-{
-	return Anti_Syscall(60LL, a1, a3, a4);
-}
-
 int main()
 {
-	unsigned char* version; // rax
-	unsigned char command[32]; // [rsp+0h] [rbp-B8h] BYREF
-	unsigned char data[152]; // [rsp+20h] [rbp-98h] BYREF
+	unsigned char* version;
+	unsigned char command[32];
+	unsigned char data[152];
 
 	//Obtain version
 	version = Anti_GetVersion();
@@ -396,5 +449,5 @@ int main()
 			sub_401420();
 		}
 	}
-	return sub_401A90(0LL);
+	return Anti_Exit(0);
 }
