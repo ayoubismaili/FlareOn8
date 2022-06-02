@@ -19,6 +19,13 @@ unsigned char ApproachGorge[38] = {
 	0xBC, 0x97
 };
 
+//byte_404000
+//.Right. Off you go. #
+unsigned char RightOffYouGo[21] = {
+	0x00, 0xEC, 0xD7, 0xD9, 0xD6, 0xCA, 0x90, 0x9E, 0xF1, 0xD8, 0xD8, 0x9E,
+	0xC7, 0xD1, 0xCB, 0x9E, 0xD9, 0xD1, 0x90, 0x9E, 0x9D
+};
+
 //dword_402260 : Crc32_Table
 unsigned char Crc32_Table[1024] = {
 	0x00, 0x00, 0x00, 0x00, 0x96, 0x30, 0x07, 0x77, 0x2C, 0x61, 0x0E, 0xEE,
@@ -110,8 +117,10 @@ unsigned char Crc32_Table[1024] = {
 };
 
 
+//unk_402000
+unsigned char AntiOS_Records[360] = {
+	0xA9, 0x95, 0x93, 0xB5, 0x29, 0xAB, 0xB5, 0x1B, 0x0E, 0x00, 0x00, 0x00,
 //unk_40200C
-unsigned char unk_40200C[360] = {
 	0x4B, 0xD0, 0xFD, 0x5E, 0xC8, 0x68, 0x84, 0x3F, 0x12, 0x00, 0x00, 0x00,
 	0xD0, 0x85, 0xED, 0xEC, 0x48, 0x3D, 0xD2, 0x82, 0x02, 0x00, 0x00, 0x00,
 	0x14, 0x92, 0x54, 0xD8, 0xE5, 0x2E, 0x47, 0x00, 0x1D, 0x00, 0x00, 0x00,
@@ -140,10 +149,8 @@ unsigned char unk_40200C[360] = {
 	0xA6, 0xE3, 0xDF, 0x80, 0x36, 0xB5, 0x0A, 0x9D, 0x1E, 0x00, 0x00, 0x00,
 	0xE1, 0xD4, 0x57, 0xE6, 0x30, 0xFD, 0xE9, 0xB4, 0x17, 0x00, 0x00, 0x00,
 	0xD4, 0xE1, 0xA1, 0x2B, 0x18, 0xD9, 0x66, 0xBE, 0x1A, 0x00, 0x00, 0x00,
-	0x9B, 0x08, 0x33, 0x7D, 0x85, 0xF5, 0xC1, 0x67, 0x06, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+	0x9B, 0x08, 0x33, 0x7D, 0x85, 0xF5, 0xC1, 0x67, 0x06, 0x00, 0x00, 0x00
 };
-
 
 #define VERSION_STRING_LENGTH   37
 #define TYPE_HELP_STRING_LENGTH 19
@@ -154,6 +161,17 @@ unsigned char unk_40200C[360] = {
 #define PROMPT_STRING_LENGTH    2
 
 #define READ_BUFFER_LENGTH      128
+
+#define MAX_ANTIOS_RECORDS      30
+
+typedef struct _ANTIOS_RECORD
+{
+	unsigned int nameCrc;
+	unsigned int colorCrc;
+	unsigned int next;
+} ANTIOS_RECORD, *PANTIOS_RECORD;
+
+#define SIZEOF_ANTIOS_RECORD sizeof(ANTIOS_RECORD)
 
 // sub_4013E0 : Anti_GetVersion
 unsigned char* Anti_GetVersion()
@@ -193,6 +211,26 @@ void* Anti_GetApproachGorge()
 	}
 	//Return the string but skip the first byte
 	return &ApproachGorge[1];
+}
+
+// sub_4012A0 : Anti_GetRightOffYouGo
+void* Anti_GetRightOffYouGo()
+{
+	unsigned char val;
+	unsigned char* ptr;
+
+	//The first byte of the string indicates if the string was already decrypted
+	val = RightOffYouGo[0];
+	if (!RightOffYouGo[0])
+	{
+		//Decrypt the string
+		for (ptr = RightOffYouGo; ptr < (RightOffYouGo + 21); val = *ptr)
+		{
+			*ptr++ = val ^ 0xBE;
+		}
+	}
+	//Return the string but skip the first byte
+	return &RightOffYouGo[1];
 }
 
 // sub_4012E0 : Anti_GetTypeHelpMessage
@@ -346,68 +384,106 @@ unsigned int Anti_Crc32(unsigned char* Data, int Length)
 	return ~result;
 }
 
-// sub_401640 : Anti_Approach
-void sub_401640()
+// sub_401AF0 : Anti_IntToStr
+unsigned char* Anti_IntToStr(unsigned int Value, unsigned char* Output)
 {
-	__int64 v0; // rbx
-	__int64 v1; // rax
-	__int64 v2; // rsi
-	int v3; // eax
-	int* v4; // rdx
-	int v5; // ecx
-	__int64 v6; // rax
-	int v7; // r8d
-	char* v8; // rax
-	char v9; // al
-	__int64 v10; // rax
-	char v12; // [rsp+Fh] [rbp-B9h] BYREF
-	char v13[32]; // [rsp+10h] [rbp-B8h] BYREF
-	char v14[152]; // [rsp+30h] [rbp-98h] BYREF
+	unsigned char* result;
 
-	v0 = 0LL;
-	v12 = 10;
-	v1 = Anti_GetApproachGorge();
-	Anti_Write(stdout, v1, 37);
+	if (Value > 9)
+		Output = Anti_IntToStr(Value / 10, Output);
+	Output[1] = 0;
+	result = Output + 1;
+	Output[0] = Value % 10 + '0';
+	return result;
+}
+
+// sub_401640 : Anti_Approach
+void Anti_Approach()
+{
+	unsigned long recordIndex;
+	void* approachGorgeStr;
+	int dataLength1;
+	unsigned int inputNameCrc;
+	unsigned int* recordPtr;
+	unsigned int nameCrc;
+	int dataLength2;
+	unsigned int colorCrc;
+	unsigned char* recordPtr2;
+	//char v9;
+	void* rightOffYouGoStr;
+	char newLine;
+	char data1[32];
+	char data2[152];
+	ANTIOS_RECORD *record;
+
+	recordIndex = 0;
+	newLine = '\n';
+	//Obtain ApproachGorge string
+	approachGorgeStr = Anti_GetApproachGorge();
+	//Write to the Console
+	Anti_Write(stdout, approachGorgeStr, 37);
 	Anti_Select(1);
-	Anti_GetWhatIsYourNameString(v13);
-	Anti_Write(stdout, v13, 19);
-	v2 = Anti_Read(stdin, v14, 128);
-	v3 = Anti_Crc32(v14, v2);
-	v4 = (int*)&unk_40200C;
-	v5 = 0xB59395A9;
-	while (v5 != v3)
+	//Obtain WhatIsYourName string
+	Anti_GetWhatIsYourNameString(data1);
+	//Write to the Console
+	Anti_Write(stdout, data1, 19);
+	//Read name from the Console
+	dataLength1 = Anti_Read(stdin, data2, 128);
+	//Calculate Crc32 of the name
+	inputNameCrc = Anti_Crc32(data2, dataLength1);
+	//Obtain a pointer to the 2nd record
+	recordPtr = (unsigned int*)&AntiOS_Records[SIZEOF_ANTIOS_RECORD * 1];
+	//Compare with precalculated Crc32 value
+	nameCrc = 0xB59395A9;
+	while (nameCrc != inputNameCrc)
 	{
-		v0++;
-		if (v0 == 30) {
+		recordIndex++;
+		if (recordIndex == MAX_ANTIOS_RECORDS) {
 			Anti_Write(stdout, "...AAARGH\n\n", 11);
 			return;
 		}
-		v5 = *v4;
-		v4 += 3;
+		nameCrc = *recordPtr;
+		recordPtr += 3;
 	}
-	Anti_GetWhatIsYourQuestString(v13);
-	Anti_Write(stdout, v13, 20);
-	if (Anti_Read(stdin, v14, 128) > 1)
+	//Obtain WhatIsYourQuest string
+	Anti_GetWhatIsYourQuestString(data1);
+	//Write string to the Console
+	Anti_Write(stdout, data1, 20);
+	if (Anti_Read(stdin, data2, 128) > 1)
 	{
-		Anti_GetWhatIsYourFavoriteColorString(v13);
-		Anti_Write(stdout, v13, 29);
-		v6 = Anti_Read(stdin, v14, 128);
-		v7 = Anti_Crc32(v14, v6);
-		v8 = (char*)&unk_402000 + 12 * v0;
-		if (*((_DWORD*)v8 + 1) == v7)
+		//Obtain WhatIsYourFavoriteColor string
+		Anti_GetWhatIsYourFavoriteColorString(data1);
+		//Write string to the Console
+		Anti_Write(stdout, data1, 29);
+		//Read color string from the Console
+		dataLength2 = Anti_Read(stdin, data2, 128);
+		//Calculate Crc32 of the color
+		colorCrc = Anti_Crc32(data2, dataLength2);
+		//Obtain the pointer to the record
+		recordPtr2 = &AntiOS_Records[SIZEOF_ANTIOS_RECORD * recordIndex];
+		//Cast pointer to a Structure Pointer
+		record = (ANTIOS_RECORD*)recordPtr2;
+		//Compare Crc32 of record color with Crc32 input color
+		if (record->colorCrc == colorCrc)
 		{
-			v9 = v8[8];
-			if (v9 > 0)
+			//Check if the next index is greater than 0
+			if (record->next > 0)
 			{
-				sub_401AF0((unsigned int)v9, v14);
-				v10 = sub_4012A0();
-				Anti_Write(stdout, v10, 20LL);
-				Anti_Write(stdout, (__int64)v14, strlen(v14));
-				Anti_Write(stdout, (__int64)&v12, 1LL);
+				//Convert index to the next record to string
+				Anti_IntToStr(record->next, data2);
+				//Obtain RightOffYouGo string
+				rightOffYouGoStr = Anti_GetRightOffYouGo();
+				//Write message to the Console
+				Anti_Write(stdout, rightOffYouGoStr, 20);
+				//Write the next index to the Console
+				Anti_Write(stdout, data2, strlen(data2));
+				//Write new line to the Console
+				Anti_Write(stdout, &newLine, 1);
 				return;
 			}
 		}
 	}
+	//Write failure message to the Console
 	Anti_Write(stdout, "...AAARGH\n\n", 11);
 }
 
@@ -542,7 +618,7 @@ int main()
 				//Check if command is approach
 				if (!Anti_StrCmp(data, command, APPROACH_STRING_LENGTH))
 					//Execute approach command
-					sub_401640();
+					Anti_Approach();
 			}
 			else
 			{
