@@ -1,5 +1,9 @@
-#include <stdio.h>
+//#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+
+#include <unistd.h>
+#include <fcntl.h>
 
 //buf_4040C0
 //.AntiochOS, version 1.32 (build 1975)
@@ -302,62 +306,62 @@ void* Anti_GetAvailableCommandsHelp()
 }
 
 // sub_4012E0 : Anti_GetTypeHelpMessage
-void Anti_GetTypeHelpMessage(unsigned char* Output)
+void Anti_GetTypeHelpMessage(char* Output)
 {
 	strcpy(Output, "Type help for help\n");
 }
 
 // sub_401340 : Anti_GetQuitString
-void Anti_GetQuitString(unsigned char* Output)
+void Anti_GetQuitString(char* Output)
 {
 	strcpy(Output, "quit\n");
 }
 
 // sub_401360 : Anti_GetHelpString
-void Anti_GetHelpString(unsigned char* Output)
+void Anti_GetHelpString(char* Output)
 {
 	strcpy(Output, "help\n");
 }
 
 // sub_401380 : Anti_GetConsultString
-void Anti_GetConsultString(unsigned char* Output)
+void Anti_GetConsultString(char* Output)
 {
 	strcpy(Output, "consult\n");
 }
 
 // sub_4013B0 : Anti_GetApproachString
-void Anti_GetApproachString(unsigned char* Output)
+void Anti_GetApproachString(char* Output)
 {
 	strcpy(Output, "approach\n");
 }
 
 // sub_401120 : Anti_GetWhatIsYourNameString
-void Anti_GetWhatIsYourNameString(unsigned char* Output)
+void Anti_GetWhatIsYourNameString(char* Output)
 {
 	strcpy(Output, "What is your name? ");
 }
 
 // sub_401180 : Anti_GetWhatIsYourQuestString
-void Anti_GetWhatIsYourQuestString(unsigned char* Output)
+void Anti_GetWhatIsYourQuestString(char* Output)
 {
 	strcpy(Output, "What is your quest? ");
 }
 
 // sub_4011E0 : Anti_GetWhatIsYourFavoriteColorString
-void Anti_GetWhatIsYourFavoriteColorString(unsigned char* Output)
+void Anti_GetWhatIsYourFavoriteColorString(char* Output)
 {
 	strcpy(Output, "What is your favorite color? ");
 }
 
 // sub_401980 : Anti_Syscall
-int Anti_Syscall(int a1, unsigned int a2, unsigned char* a3, int a4)
+int Anti_Syscall(int a1, void* a2, void* a3, void* a4)
 {
 	long result; // rax
 
 	//https://man7.org/linux/man-pages/man2/syscall.2.html
 	//Arch/ABI      arg1  arg2  arg3  arg4  arg5  arg6  arg7  Notes
 	//x86-64        rdi   rsi   rdx   r10   r8    r9    -
-	// 
+	//
 	// mov     rax, rdi
 	// mov     rdi, rsi
 	// mov     rsi, rdx
@@ -378,7 +382,7 @@ int Anti_Write(int fd, const void* buf, size_t count)
 	//https://blog.rchapman.org/posts/Linux_System_Call_Table_for_x86_64/
 	//https://github.com/torvalds/linux/blob/master/arch/x86/entry/syscalls/syscall_64.tbl
 	//sys_write = 1
-	return Anti_Syscall(1, fd, buf, count);
+	return Anti_Syscall(1, (void*)fd, (void*)buf, (void*)count);
 }
 
 // sub_401A10 : Anti_Read
@@ -387,7 +391,7 @@ int Anti_Read(int fd, const void* buf, size_t count)
 	//https://blog.rchapman.org/posts/Linux_System_Call_Table_for_x86_64/
 	//https://github.com/torvalds/linux/blob/master/arch/x86/entry/syscalls/syscall_64.tbl
 	//sys_read = 0
-	return Anti_Syscall(0, fd, buf, count);
+	return Anti_Syscall(0, (void*)fd, (void*)buf, (void*)count);
 }
 
 // sub_401A90 : Anti_Exit
@@ -396,7 +400,7 @@ int Anti_Exit(int error_code)
 	//https://blog.rchapman.org/posts/Linux_System_Call_Table_for_x86_64/
 	//https://github.com/torvalds/linux/blob/master/arch/x86/entry/syscalls/syscall_64.tbl
 	//sys_exit = 60
-	return Anti_Syscall(60, error_code, 0, 0);
+	return Anti_Syscall(60, (void*)error_code, (void*)0, (void*)0);
 }
 
 // sub_401AB0 : Anti_StrCmp
@@ -471,7 +475,7 @@ int Anti_Open(const char* FileName, int Flags, int Mode)
 	//https://blog.rchapman.org/posts/Linux_System_Call_Table_for_x86_64/
 	//https://github.com/torvalds/linux/blob/master/arch/x86/entry/syscalls/syscall_64.tbl
 	//sys_open = 2
-	return Anti_Syscall(2, FileName, Flags, Mode);
+	return Anti_Syscall(2, (void*)FileName, (void*)Flags, (void*)Mode);
 }
 
 // sub_401A30 : Anti_Close
@@ -480,7 +484,7 @@ int Anti_Close(unsigned int fd)
 	//https://blog.rchapman.org/posts/Linux_System_Call_Table_for_x86_64/
 	//https://github.com/torvalds/linux/blob/master/arch/x86/entry/syscalls/syscall_64.tbl
 	//sys_close = 3
-	return Anti_Syscall(3, fd, 0, 0);
+	return Anti_Syscall(3, (void*)fd, (void*)0, (void*)0);
 }
 
 // sub_401000 : Anti_GetAsciiArtCharset
@@ -513,16 +517,16 @@ void Anti_Approach()
 	//Obtain ApproachGorge string
 	approachGorgeStr = Anti_GetApproachGorge();
 	//Write to the Console
-	Anti_Write(stdout, approachGorgeStr, 37);
+	write(STDOUT_FILENO, approachGorgeStr, 37);
 	Anti_Select(1);
 	//Obtain WhatIsYourName string
 	Anti_GetWhatIsYourNameString(data1);
 	//Write to the Console
-	Anti_Write(stdout, data1, 19);
+	write(STDOUT_FILENO, data1, 19);
 	//Read name from the Console
-	dataLength1 = Anti_Read(stdin, data2, 128);
+	dataLength1 = read(STDIN_FILENO, data2, 128);
 	//Calculate Crc32 of the name
-	inputNameCrc = Anti_Crc32(data2, dataLength1);
+	inputNameCrc = Anti_Crc32((unsigned char*)data2, dataLength1);
 	//Obtain a pointer to the 2nd record
 	recordPtr = (unsigned int*)&AntiOS_Records[SIZEOF_ANTIOS_RECORD * 1];
 	//Compare with precalculated Crc32 value
@@ -531,7 +535,7 @@ void Anti_Approach()
 	{
 		recordIndex++;
 		if (recordIndex == MAX_ANTIOS_RECORDS) {
-			Anti_Write(stdout, "...AAARGH\n\n", 11);
+			write(STDOUT_FILENO, "...AAARGH\n\n", 11);
 			return;
 		}
 		nameCrc = *recordPtr;
@@ -540,17 +544,17 @@ void Anti_Approach()
 	//Obtain WhatIsYourQuest string
 	Anti_GetWhatIsYourQuestString(data1);
 	//Write string to the Console
-	Anti_Write(stdout, data1, 20);
-	if (Anti_Read(stdin, data2, 128) > 1)
+	write(STDOUT_FILENO, data1, 20);
+	if (read(STDIN_FILENO, data2, 128) > 1)
 	{
 		//Obtain WhatIsYourFavoriteColor string
 		Anti_GetWhatIsYourFavoriteColorString(data1);
 		//Write string to the Console
-		Anti_Write(stdout, data1, 29);
+		write(STDOUT_FILENO, data1, 29);
 		//Read color string from the Console
-		dataLength2 = Anti_Read(stdin, data2, 128);
+		dataLength2 = read(STDIN_FILENO, data2, 128);
 		//Calculate Crc32 of the color
-		colorCrc = Anti_Crc32(data2, dataLength2);
+		colorCrc = Anti_Crc32((unsigned char*)data2, dataLength2);
 		//Obtain the pointer to the record
 		recordPtr2 = &AntiOS_Records[SIZEOF_ANTIOS_RECORD * recordIndex];
 		//Cast pointer to a Structure Pointer
@@ -562,21 +566,21 @@ void Anti_Approach()
 			if (record->next > 0)
 			{
 				//Convert index to the next record to string
-				Anti_IntToStr(record->next, data2);
+				Anti_IntToStr(record->next, (unsigned char*)data2);
 				//Obtain RightOffYouGo string
 				rightOffYouGoStr = Anti_GetRightOffYouGo();
 				//Write message to the Console
-				Anti_Write(stdout, rightOffYouGoStr, 20);
+				write(STDOUT_FILENO, rightOffYouGoStr, 20);
 				//Write the next index to the Console
-				Anti_Write(stdout, data2, strlen(data2));
+				write(STDOUT_FILENO, data2, strlen(data2));
 				//Write new line to the Console
-				Anti_Write(stdout, &newLine, 1);
+				write(STDOUT_FILENO, &newLine, 1);
 				return;
 			}
 		}
 	}
 	//Write failure message to the Console
-	Anti_Write(stdout, "...AAARGH\n\n", 11);
+	write(STDOUT_FILENO, "...AAARGH\n\n", 11);
 }
 
 // sub_401460 : Anti_Consult
@@ -596,13 +600,13 @@ void Anti_Consult()
 	//Initialize first file name character
 	fileNameChar = 'a';
 	//Copy file name
-	strcpy(fileName, "..dat");
+	strcpy((char*)fileName, "..dat");
 	//Zero incremental data
 	memset(incrementalData, 0, sizeof(incrementalData));
 	//Obtain ConsultBookOfArmaments string
 	consultBookOfArmamentsStr = Anti_GetConsultBookOfArmaments();
 	//Write message to the Console
-	Anti_Write(stdout, consultBookOfArmamentsStr, 31);
+	write(STDOUT_FILENO, consultBookOfArmamentsStr, 31);
 	Anti_Select(2);
 	do
 	{
@@ -612,7 +616,7 @@ void Anti_Consult()
 			//Set the file name character
 			fileName[0] = fileNameChar;
 			//Try to open file
-			fd = Anti_Open(fileName);
+			fd = open((const char*) fileName, 0, 0); /* ?? TO CONFIRM */
 			//Break if the file descriptor is valid
 			if (fd >= 0)
 				break;
@@ -621,9 +625,9 @@ void Anti_Consult()
 				goto NO_MORE_FILES;
 		}
 		//Read data from file
-		Anti_Read(fd, fileData, ANTIOS_ASCII_ART_LENGTH);
+		read(fd, fileData, ANTIOS_ASCII_ART_LENGTH);
 		//Close the file
-		Anti_Close(fd);
+		close(fd);
 		//Initialize incremental pointer
 		incrementalPtr = incrementalData;
 		//Initialize file pointer
@@ -659,7 +663,7 @@ NO_MORE_FILES:
 		incrementalData[i] = artChar;
 	}
 	//Write the final incremental data which represent the Ascii Art
-	Anti_Write(stdout, incrementalData, ANTIOS_ASCII_ART_LENGTH);
+	write(STDOUT_FILENO, incrementalData, ANTIOS_ASCII_ART_LENGTH);
 }
 
 // sub_401420 : Anti_Help
@@ -670,25 +674,25 @@ void Anti_Help()
 	//Obtain AvailableCommandsHelp
 	availableCommandsHelpStr = Anti_GetAvailableCommandsHelp();
 	//Write message to the Console
-	Anti_Write(stdout, availableCommandsHelpStr, 42);
+	write(STDOUT_FILENO, availableCommandsHelpStr, 42);
 	//Write failure message to the Console
-	Anti_Write(stdout, "...AAARGH\n\n", 11);
+	write(STDOUT_FILENO, "...AAARGH\n\n", 11);
 }
 
 int main()
 {
 	unsigned char* version;
-	unsigned char command[32];
-	unsigned char data[152];
+	char command[32];
+	char data[152];
 
 	//Obtain version
 	version = Anti_GetVersion();
 	//Write version to the Console
-	Anti_Write(stdout, version, VERSION_STRING_LENGTH);
+	write(STDOUT_FILENO, version, VERSION_STRING_LENGTH);
 	//Obtain Type Help message
 	Anti_GetTypeHelpMessage(data);
 	//Write Type Help message to the Console
-	Anti_Write(stdout, data, TYPE_HELP_STRING_LENGTH);
+	write(STDOUT_FILENO, data, TYPE_HELP_STRING_LENGTH);
 	//Command loop
 	while (1)
 	{
@@ -696,29 +700,29 @@ int main()
 		data[0] = '>';
 		data[1] = ' ';
 		//Write prompt string to the console
-		Anti_Write(stdout, data, PROMPT_STRING_LENGTH);
+		write(STDOUT_FILENO, data, PROMPT_STRING_LENGTH);
 		//Read command from the Console
-		if (!Anti_Read(stdin, data, READ_BUFFER_LENGTH))
+		if (!read(STDIN_FILENO, data, READ_BUFFER_LENGTH))
 			break;
 		//Obtain quit string
 		Anti_GetQuitString(command);
 		//Check if command is quit
-		if (!Anti_StrCmp(data, command, QUIT_STRING_LENGTH))
+		if (!Anti_StrCmp((unsigned char*)data, (unsigned char*)command, QUIT_STRING_LENGTH))
 			break;
 		//Obtain help string
 		Anti_GetHelpString(command);
 		//Check if command is NOT help
-		if (Anti_StrCmp(data, command, HELP_STRING_LENGTH))
+		if (Anti_StrCmp((unsigned char*)data, (unsigned char*)command, HELP_STRING_LENGTH))
 		{
 			//Obtain consult string
 			Anti_GetConsultString(command);
 			//Check if command is NOT consult
-			if (Anti_StrCmp(data, command, CONSULT_STRING_LENGTH))
+			if (Anti_StrCmp((unsigned char*)data, (unsigned char*)command, CONSULT_STRING_LENGTH))
 			{
 				//Obtain approach string
 				Anti_GetApproachString(command);
 				//Check if command is approach
-				if (!Anti_StrCmp(data, command, APPROACH_STRING_LENGTH))
+				if (!Anti_StrCmp((unsigned char*)data, (unsigned char*)command, APPROACH_STRING_LENGTH))
 					//Execute approach command
 					Anti_Approach();
 			}

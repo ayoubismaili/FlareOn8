@@ -1,0 +1,6 @@
+# depslib dependency file v1.0
+1654293330 source:/home/ayoub/Desktop/FlareOn8/AntiochOS/main.cpp
+	<stdlib.h>
+	<string.h>
+	<unistd.h>
+
