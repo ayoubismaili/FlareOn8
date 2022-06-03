@@ -34,6 +34,14 @@ unsigned char ConsultBookOfArmaments[32] = {
 	0xD3, 0xDF, 0xD7, 0xDC, 0xC6, 0xC1, 0x93, 0xB8
 };
 
+//
+//.Available commands:  help: print this help
+unsigned char AvailableCommandsHelp[43] = {
+	0x00, 0xD4, 0xE3, 0xF4, 0xFC, 0xF9, 0xF4, 0xF7, 0xF9, 0xF0, 0xB5, 0xF6,
+	0xFA, 0xF8, 0xF8, 0xF4, 0xFB, 0xF1, 0xE6, 0xAF, 0x9F, 0xFD, 0xF0, 0xF9,
+	0xE5, 0xAF, 0xB5, 0xE5, 0xE7, 0xFC, 0xFB, 0xE1, 0xB5, 0xE1, 0xFD, 0xFC,
+	0xE6, 0xB5, 0xFD, 0xF0, 0xF9, 0xE5, 0x9F
+};
 
 //dword_402260 : Crc32_Table
 unsigned char Crc32_Table[1024] = {
@@ -271,6 +279,26 @@ void* Anti_GetConsultBookOfArmaments()
 	}
 	//Return the string but skip the first byte
 	return &ConsultBookOfArmaments[1];
+}
+
+// sub_4010A0 : Anti_GetAvailableCommandsHelp
+void* Anti_GetAvailableCommandsHelp()
+{
+	unsigned char val;
+	unsigned char* ptr;
+
+	//The first byte of the string indicates if the string was already decrypted
+	val = AvailableCommandsHelp[0];
+	if (!AvailableCommandsHelp[0])
+	{
+		//Decrypt the string
+		for (ptr = AvailableCommandsHelp; ptr < (AvailableCommandsHelp + 43); val = *ptr)
+		{
+			*ptr++ = val ^ 0x95;
+		}
+	}
+	//Return the string but skip the first byte
+	return &AvailableCommandsHelp[1];
 }
 
 // sub_4012E0 : Anti_GetTypeHelpMessage
@@ -634,13 +662,17 @@ NO_MORE_FILES:
 	Anti_Write(stdout, incrementalData, ANTIOS_ASCII_ART_LENGTH);
 }
 
-__int64 sub_401420()
+// sub_401420 : Anti_Help
+void Anti_Help()
 {
-	__int64 v0; // rax
+	void* availableCommandsHelpStr;
 
-	v0 = sub_4010A0();
-	Anti_Write(1u, v0, 42LL);
-	return Anti_Write(1u, (__int64)"...AAARGH\n\n", 11LL);
+	//Obtain AvailableCommandsHelp
+	availableCommandsHelpStr = Anti_GetAvailableCommandsHelp();
+	//Write message to the Console
+	Anti_Write(stdout, availableCommandsHelpStr, 42);
+	//Write failure message to the Console
+	Anti_Write(stdout, "...AAARGH\n\n", 11);
 }
 
 int main()
@@ -699,7 +731,7 @@ int main()
 		else
 		{
 			//Execute help command
-			sub_401420();
+			Anti_Help();
 		}
 	}
 	return Anti_Exit(0);
