@@ -191,6 +191,8 @@ unsigned char AntiOS_AsciiInit[16] = {
 	0x2E, 0x2E, 0x2E, 0x2E
 };
 
+#define ANTIOS_ASCII_ART_LENGTH 4096
+
 // sub_4013E0 : Anti_GetVersion
 unsigned char* Anti_GetVersion()
 {
@@ -552,66 +554,84 @@ void Anti_Approach()
 // sub_401460 : Anti_Consult
 void Anti_Consult()
 {
-	int v0; // r14d
-	__int64 v1; // rax
-	signed int v2; // eax
-	unsigned int v3; // r13d
-	unsigned char* v4; // rax
-	unsigned char* v5; // rdx
-	__int64 i; // rax
-	char v7; // dl
-	unsigned char v9[8]; // [rsp+8h] [rbp-2030h] BYREF
-	unsigned char v10[4096]; // [rsp+10h] [rbp-2028h] BYREF
-	unsigned char v11[4096]; // [rsp+1010h] [rbp-1028h] BYREF
-	char v12; // [rsp+2010h] [rbp-28h] BYREF
+	int fileNameChar;
+	void* consultBookOfArmamentsStr;
+	int fd;
+	unsigned char* incrementalPtr;
+	unsigned char* filePtr;
+	int i;
+	unsigned char artChar;
+	unsigned char fileName[8];
+	unsigned char fileData[ANTIOS_ASCII_ART_LENGTH];
+	unsigned char incrementalData[ANTIOS_ASCII_ART_LENGTH];
 
-	v0 = 'a';
-	//v9 = 0x7461642E2ELL;
-	strcpy(v9, "..dat");
-	memset(v11, 0, sizeof(v11));
-	v1 = Anti_GetConsultBookOfArmaments();
-	Anti_Write(stdout, v1, 31);
+	//Initialize first file name character
+	fileNameChar = 'a';
+	//Copy file name
+	strcpy(fileName, "..dat");
+	//Zero incremental data
+	memset(incrementalData, 0, sizeof(incrementalData));
+	//Obtain ConsultBookOfArmaments string
+	consultBookOfArmamentsStr = Anti_GetConsultBookOfArmaments();
+	//Write message to the Console
+	Anti_Write(stdout, consultBookOfArmamentsStr, 31);
 	Anti_Select(2);
 	do
 	{
+		//File open loop
 		while (1)
 		{
-			//LOBYTE(v9) = v0;
-			v9[0] = v0;
-			v2 = Anti_Open(v9);
-			v3 = v2;
-			if (v2 >= 0)
+			//Set the file name character
+			fileName[0] = fileNameChar;
+			//Try to open file
+			fd = Anti_Open(fileName);
+			//Break if the file descriptor is valid
+			if (fd >= 0)
 				break;
-			if (++v0 == ('z' + 1))
+			//Exit loops if all files was handled
+			if (++fileNameChar == ('z' + 1))
 				goto NO_MORE_FILES;
 		}
-		Anti_Read(v2, v10, 4096);
-		Anti_Close(v3);
-		v4 = v11;
-		v5 = v10;
+		//Read data from file
+		Anti_Read(fd, fileData, ANTIOS_ASCII_ART_LENGTH);
+		//Close the file
+		Anti_Close(fd);
+		//Initialize incremental pointer
+		incrementalPtr = incrementalData;
+		//Initialize file pointer
+		filePtr = fileData;
+		//Xor file data with incremental data
 		do
 		{
-			*v4++ ^= *v5++;
-		} while (v4 != &v11[4096]);
-		++v0;
-	} while (v0 != ('z' + 1));
+			*incrementalPtr++ ^= *filePtr++;
+		} while (incrementalPtr != &incrementalData[ANTIOS_ASCII_ART_LENGTH]);
+		++fileNameChar;
+	} while (fileNameChar != ('z' + 1));
+
 NO_MORE_FILES:
+	//One time initialization of AsciiBlock
 	if (!AntiOS_AsciiBlock[0])
 	{
 		for (int j = 0; j < (16 * 16); j += 16)
 		{
+			//Initialize AsciiBlock
 			memcpy(&AntiOS_AsciiBlock[j], AntiOS_AsciiInit, 16);
 		}
+		//Overwrite part of AsciiBlock data with Art Charset
 		Anti_GetAsciiArtCharset(AntiOS_AsciiBlock);
 	}
-	for (i = 0; i != 4096; ++i)
+	for (i = 0; i != ANTIOS_ASCII_ART_LENGTH; ++i)
 	{
-		v7 = '\n';
+		//Set default char to new line
+		artChar = '\n';
+		//Otherwise, obtain character from AsciiBlock through mapping
 		if ((i & 15) != 15)
-			v7 = AntiOS_AsciiBlock[v11[i]];
-		v11[i] = v7;
+			artChar = AntiOS_AsciiBlock[incrementalData[i]];
+		//Put the character in the incremental data
+		incrementalData[i] = artChar;
 	}
-	Anti_Write(stdout, v11, 4096);
+	//Write the final incremental data which represent the Ascii Art
+	Anti_Write(stdout, incrementalData, ANTIOS_ASCII_ART_LENGTH);
 }
 
 __int64 sub_401420()
