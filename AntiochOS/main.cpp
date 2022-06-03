@@ -26,6 +26,15 @@ unsigned char RightOffYouGo[21] = {
 	0xC7, 0xD1, 0xCB, 0x9E, 0xD9, 0xD1, 0x90, 0x9E, 0x9D
 };
 
+//byte_404060
+//.Consult the Book of Armaments!
+unsigned char ConsultBookOfArmaments[32] = {
+	0x00, 0xF1, 0xDD, 0xDC, 0xC1, 0xC7, 0xDE, 0xC6, 0x92, 0xC6, 0xDA, 0xD7,
+	0x92, 0xF0, 0xDD, 0xDD, 0xD9, 0x92, 0xDD, 0xD4, 0x92, 0xF3, 0xC0, 0xDF,
+	0xD3, 0xDF, 0xD7, 0xDC, 0xC6, 0xC1, 0x93, 0xB8
+};
+
+
 //dword_402260 : Crc32_Table
 unsigned char Crc32_Table[1024] = {
 	0x00, 0x00, 0x00, 0x00, 0x96, 0x30, 0x07, 0x77, 0x2C, 0x61, 0x0E, 0xEE,
@@ -173,6 +182,15 @@ typedef struct _ANTIOS_RECORD
 
 #define SIZEOF_ANTIOS_RECORD sizeof(ANTIOS_RECORD)
 
+// xmmword_404100
+unsigned char AntiOS_AsciiBlock[256];
+
+// xmmword_402240
+unsigned char AntiOS_AsciiInit[16] = {
+	0x2E, 0x2E, 0x2E, 0x2E, 0x2E, 0x2E, 0x2E, 0x2E, 0x2E, 0x2E, 0x2E, 0x2E,
+	0x2E, 0x2E, 0x2E, 0x2E
+};
+
 // sub_4013E0 : Anti_GetVersion
 unsigned char* Anti_GetVersion()
 {
@@ -231,6 +249,26 @@ void* Anti_GetRightOffYouGo()
 	}
 	//Return the string but skip the first byte
 	return &RightOffYouGo[1];
+}
+
+// sub_4010E0 : Anti_GetConsultBookOfArmaments
+void* Anti_GetConsultBookOfArmaments()
+{
+	unsigned char val;
+	unsigned char* ptr;
+
+	//The first byte of the string indicates if the string was already decrypted
+	val = ConsultBookOfArmaments[0];
+	if (!ConsultBookOfArmaments[0])
+	{
+		//Decrypt the string
+		for (ptr = ConsultBookOfArmaments; ptr < (ConsultBookOfArmaments + 32); val = *ptr)
+		{
+			*ptr++ = val ^ 0xB2;
+		}
+	}
+	//Return the string but skip the first byte
+	return &ConsultBookOfArmaments[1];
 }
 
 // sub_4012E0 : Anti_GetTypeHelpMessage
@@ -397,6 +435,30 @@ unsigned char* Anti_IntToStr(unsigned int Value, unsigned char* Output)
 	return result;
 }
 
+// sub_4019D0 : Anti_Open
+int Anti_Open(const char* FileName, int Flags, int Mode)
+{
+	//https://blog.rchapman.org/posts/Linux_System_Call_Table_for_x86_64/
+	//https://github.com/torvalds/linux/blob/master/arch/x86/entry/syscalls/syscall_64.tbl
+	//sys_open = 2
+	return Anti_Syscall(2, FileName, Flags, Mode);
+}
+
+// sub_401A30 : Anti_Close
+int Anti_Close(unsigned int fd)
+{
+	//https://blog.rchapman.org/posts/Linux_System_Call_Table_for_x86_64/
+	//https://github.com/torvalds/linux/blob/master/arch/x86/entry/syscalls/syscall_64.tbl
+	//sys_close = 3
+	return Anti_Syscall(3, fd, 0, 0);
+}
+
+// sub_401000 : Anti_GetAsciiArtCharset
+void Anti_GetAsciiArtCharset(void* Output)
+{
+	memcpy(Output, "V',`)(//\\\\\\||||||||||||_______________", 38);
+}
+
 // sub_401640 : Anti_Approach
 void Anti_Approach()
 {
@@ -487,82 +549,70 @@ void Anti_Approach()
 	Anti_Write(stdout, "...AAARGH\n\n", 11);
 }
 
-/*
-__int64 sub_401460()
+// sub_401460 : Anti_Consult
+void Anti_Consult()
 {
 	int v0; // r14d
-	__int64 v1; // rsi
+	__int64 v1; // rax
 	signed int v2; // eax
 	unsigned int v3; // r13d
-	char* v4; // rax
-	__int64* v5; // rdx
+	unsigned char* v4; // rax
+	unsigned char* v5; // rdx
 	__int64 i; // rax
 	char v7; // dl
-	__int64 v9; // [rsp+8h] [rbp-2030h] BYREF
-	__int64 v10[512]; // [rsp+10h] [rbp-2028h] BYREF
-	unsigned __int8 v11[4096]; // [rsp+1010h] [rbp-1028h] BYREF
+	unsigned char v9[8]; // [rsp+8h] [rbp-2030h] BYREF
+	unsigned char v10[4096]; // [rsp+10h] [rbp-2028h] BYREF
+	unsigned char v11[4096]; // [rsp+1010h] [rbp-1028h] BYREF
 	char v12; // [rsp+2010h] [rbp-28h] BYREF
 
-	v0 = 97;
-	v9 = 0x7461642E2ELL;
+	v0 = 'a';
+	//v9 = 0x7461642E2ELL;
+	strcpy(v9, "..dat");
 	memset(v11, 0, sizeof(v11));
-	v1 = sub_4010E0();
-	sub_4019F0(1u, v1, 31LL);
-	sub_401A50(2LL);
+	v1 = Anti_GetConsultBookOfArmaments();
+	Anti_Write(stdout, v1, 31);
+	Anti_Select(2);
 	do
 	{
 		while (1)
 		{
-			LOBYTE(v9) = v0;
-			v2 = sub_4019D0(&v9);
+			//LOBYTE(v9) = v0;
+			v9[0] = v0;
+			v2 = Anti_Open(v9);
 			v3 = v2;
 			if (v2 >= 0)
 				break;
-			if ((_BYTE)++v0 == 123)
-				goto LABEL_7;
+			if (++v0 == ('z' + 1))
+				goto NO_MORE_FILES;
 		}
-		sub_401A10(v2, (__int64)v10, 4096LL);
-		sub_401A30(v3);
-		v4 = (char*)v11;
+		Anti_Read(v2, v10, 4096);
+		Anti_Close(v3);
+		v4 = v11;
 		v5 = v10;
 		do
 		{
-			*v4++ ^= *(_BYTE*)v5;
-			v5 = (__int64*)((char*)v5 + 1);
-		} while (v4 != &v12);
+			*v4++ ^= *v5++;
+		} while (v4 != &v11[4096]);
 		++v0;
-	} while ((_BYTE)v0 != 123);
-LABEL_7:
-	if (!(_BYTE)xmmword_404100)
+	} while (v0 != ('z' + 1));
+NO_MORE_FILES:
+	if (!AntiOS_AsciiBlock[0])
 	{
-		xmmword_404100 = (__int128)_mm_load_si128((const __m128i*) & xmmword_402240);
-		xmmword_404110 = xmmword_404100;
-		xmmword_404120 = xmmword_404100;
-		xmmword_404130 = xmmword_404100;
-		xmmword_404140 = xmmword_404100;
-		xmmword_404150 = xmmword_404100;
-		xmmword_404160 = xmmword_404100;
-		xmmword_404170 = xmmword_404100;
-		xmmword_404180 = xmmword_404100;
-		xmmword_404190 = xmmword_404100;
-		xmmword_4041A0 = xmmword_404100;
-		xmmword_4041B0 = xmmword_404100;
-		xmmword_4041C0 = xmmword_404100;
-		xmmword_4041D0 = xmmword_404100;
-		xmmword_4041E0 = xmmword_404100;
-		xmmword_4041F0 = xmmword_404100;
-		sub_401000(&xmmword_404100);
+		for (int j = 0; j < (16 * 16); j += 16)
+		{
+			memcpy(&AntiOS_AsciiBlock[j], AntiOS_AsciiInit, 16);
+		}
+		Anti_GetAsciiArtCharset(AntiOS_AsciiBlock);
 	}
-	for (i = 0LL; i != 4096; ++i)
+	for (i = 0; i != 4096; ++i)
 	{
-		v7 = 10;
-		if ((i & 0xF) != 15)
-			v7 = *((_BYTE*)&xmmword_404100 + v11[i]);
+		v7 = '\n';
+		if ((i & 15) != 15)
+			v7 = AntiOS_AsciiBlock[v11[i]];
 		v11[i] = v7;
 	}
-	return sub_4019F0(1u, (__int64)v11, 4096LL);
-}*/
-
+	Anti_Write(stdout, v11, 4096);
+}
 
 __int64 sub_401420()
 {
@@ -623,7 +673,7 @@ int main()
 			else
 			{
 				//Execute consult command
-				sub_401460();
+				Anti_Consult();
 			}
 		}
 		else
