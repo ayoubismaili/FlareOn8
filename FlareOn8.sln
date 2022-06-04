@@ -5,6 +5,8 @@ VisualStudioVersion = 17.2.32516.85
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UnlockYourFiles", "UnlockYourFiles\UnlockYourFiles.vcxproj", "{BDA08994-5854-47C9-8004-B9E1312A8189}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "myaquaticlife", "myaquaticlife\myaquaticlife.vcxproj", "{984A4828-90F0-4683-8851-5A64F4DA171C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -21,6 +23,14 @@ Global
 		{BDA08994-5854-47C9-8004-B9E1312A8189}.Release|x64.Build.0 = Release|x64
 		{BDA08994-5854-47C9-8004-B9E1312A8189}.Release|x86.ActiveCfg = Release|Win32
 		{BDA08994-5854-47C9-8004-B9E1312A8189}.Release|x86.Build.0 = Release|Win32
+		{984A4828-90F0-4683-8851-5A64F4DA171C}.Debug|x64.ActiveCfg = Debug|x64
+		{984A4828-90F0-4683-8851-5A64F4DA171C}.Debug|x64.Build.0 = Debug|x64
+		{984A4828-90F0-4683-8851-5A64F4DA171C}.Debug|x86.ActiveCfg = Debug|Win32
+		{984A4828-90F0-4683-8851-5A64F4DA171C}.Debug|x86.Build.0 = Debug|Win32
+		{984A4828-90F0-4683-8851-5A64F4DA171C}.Release|x64.ActiveCfg = Release|x64
+		{984A4828-90F0-4683-8851-5A64F4DA171C}.Release|x64.Build.0 = Release|x64
+		{984A4828-90F0-4683-8851-5A64F4DA171C}.Release|x86.ActiveCfg = Release|Win32
+		{984A4828-90F0-4683-8851-5A64F4DA171C}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
