@@ -139,161 +139,77 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
     return (INT_PTR)FALSE;
 }
 
-void sub_4BB144() {
-    //TODO: Add code
-}
-
-void sub_4DDF8E() {
-    //TODO: Add code
-}
-
-void sub_4DE68E() {
-    //TODO: Add code
-}
-
-void sub_4D5554() {
-    //TODO: Add code
-}
-
-void sub_4D5508(int val) {
-    //TODO: Add code
-}
-
-char* sub_4DF5C7(void* data) {
-    //TODO: Add code
-    return NULL;
-}
-
-int sub_4DF689(void* data) {
-    //TODO: Add code
-    return 0;
-}
-
-int sub_4D503A(HWND hWnd) {
-    //TODO: Add code
-    return 0;
-}
-
-int sub_4DE606()
+HWND __thiscall sub_4D731F(HWND* this, char a2)
 {
-    int result; // eax
-
-    result = *(DWORD*)(sub_4DF5C7(sub_4DDF8E) + 4);
-    if (!result)
-        return sub_4DF689(sub_4DE68E);
-    return result;
-}
-
-HWND sub_4D8E88(int val) 
-{
-    //TODO: Add code
-    return NULL;
-}
-
-int sub_4D7997(int val) 
-{
-    //TODO: Add code
-    return 0;
-}
-
-void sub_4D731F(char val) 
-{
-    //TODO: Add code
-}
-
-void sub_4D7ADF(int v1, int v2, int v3, int v4, int v5, int v6) 
-{
-    //TODO: Add code
-}
-
-void sub_4D8EC2(int val) 
-{
-    //TODO: Add code
-}
-
-//Unknown Class
-typedef struct _CLASS1 {
-    DWORD val8; // dword [ a1 - 32 ]
-    DWORD val7; // dword [ a1 - 28 ]
-    DWORD val6; // dword [ a1 - 24 ]
-    HWND val5;  // dword [ a1 - 20 ]
-    int* val4;  // dword [ a1 - 16 ]
-    DWORD val3; // dword [ a1 - 12 ]
-    DWORD val2; // dword [ a1 - 8 ]
-    DWORD val1; // dword [ a1 - 4 ]
-
-} CLASS1, *PCLASS1;
-
-BOOL sub_4D8C20(CLASS1* cls, DWORD dwValue, int val, HMODULE hModule) {
-    return FALSE;
-}
-
-int sub_4D8F04(CLASS1* a1, unsigned int ecx)
-{
-    a1 -= 1;
-
-    int v1 = ecx; // ecx
-    int v2; // esi
-    HGLOBAL Resource; // edi
-    HMODULE v4; // ebx
-    HRSRC ResourceA; // eax
-    bool v7; // zf
+    HWND Parent; // eax
+    struct tagMSG* v4; // ebp
+    LPARAM v5; // eax
+    int v6; // eax
+    UINT message; // eax
     int v8; // eax
-    char v9; // bl
-    int v10; // [esp-24h] [ebp-24h] BYREF
+    int v10; // [esp+10h] [ebp-10h]
+    LPARAM lParam; // [esp+14h] [ebp-Ch]
+    int v12; // [esp+18h] [ebp-8h]
+    HWND hWnd; // [esp+1Ch] [ebp-4h]
 
-    sub_4BB144();
-    v2 = v1;
-    a1->val4 = &v10;
-    a1->val7 = v1;
-    Resource = *(HGLOBAL*)(v1 + 68);
-    a1->val6 = *(DWORD*)(v1 + 72);
-    v4 = *(HMODULE*)(sub_4DE606() + 12);
-    if (*(DWORD*)(v2 + 64))
+    v12 = 1;
+    lParam = 0;
+    if ((a2 & 4) == 0 || (v10 = 1, (sub_4D7997(this) & 0x10000000) != 0))
+        v10 = 0;
+    Parent = GetParent(this[7]);
+    this[9] = (HWND)((unsigned int)this[9] | 0x18);
+    hWnd = Parent;
+    v4 = (struct tagMSG*)(sub_4DA0DD() + 48);
+LABEL_5:
+    while (v12 && !PeekMessageA(v4, 0, 0, 0, 0))
     {
-        v4 = *(HMODULE*)(sub_4DE606() + 12);
-        ResourceA = FindResourceA(v4, *(LPCSTR*)(v2 + 64), RT_DIALOG);
-        Resource = LoadResource(v4, ResourceA);
-    }
-    if (Resource)
-        a1->val6 = (DWORD)LockResource(Resource);
-    if (!a1->val6)
-        return -1;
-    a1->val5 = sub_4D8E88(v2);
-    sub_4D5554();
-    v7 = a1->val5 == 0;
-    a1->val8 = 0;
-    if (!v7 && IsWindowEnabled(a1->val5))
-    {
-        EnableWindow(a1->val5, FALSE);
-        a1->val8 = 1;
-    }
-    a1->val1 = 0;
-    sub_4D5508(v2);
-    v8 = sub_4D503A(a1->val5);
-    if (sub_4D8C20(a1, a1->val6, v8, v4))
-    {
-        if ((*(BYTE*)(v2 + 36) & 0x10) != 0)
+        if (v10)
         {
-            v9 = 4;
-            if ((sub_4D7997(v2) & 0x100) != 0)
-                v9 = 5;
-            sub_4D731F(v9);
+            sub_4D7B2E(1);
+            UpdateWindow(this[7]);
+            v10 = 0;
         }
-        if (*(DWORD*)(v2 + 28))
-            sub_4D7ADF(0, 0, 0, 0, 0, 0x97u);
+        if ((a2 & 1) == 0 && hWnd && !lParam)
+            SendMessageA(hWnd, 0x121u, 0, (LPARAM)this[7]);
+        if ((a2 & 2) == 0)
+        {
+            v5 = lParam++;
+            if (SendMessageA(this[7], 0x36Au, 0, v5))
+                continue;
+        }
+        v12 = 0;
     }
-    a1->val1 = -1;
-    if (a1->val8)
-        EnableWindow(a1->val5, TRUE);
-    if (a1->val5)
+    while (1)
     {
-        if (GetActiveWindow() == *(HWND*)(v2 + 28))
-            SetActiveWindow(a1->val5);
+        v6 = sub_4DA0DD();
+        if (!(*(int(__thiscall**)(int))(*(_DWORD*)v6 + 92))(v6))
+        {
+            sub_4E22EB(0);
+            return HWND_MESSAGE | 0x2;
+        }
+        if (v10)
+        {
+            message = v4->message;
+            if (message == 280 || message == 260)
+            {
+                sub_4D7B2E(1);
+                UpdateWindow(this[7]);
+                v10 = 0;
+            }
+        }
+        if (!(*((int(__thiscall**)(HWND*)) * this + 28))(this))
+            break;
+        v8 = sub_4DA0DD();
+        if ((*(int(__thiscall**)(int, struct tagMSG*))(*(_DWORD*)v8 + 100))(v8, v4))
+        {
+            v12 = 1;
+            lParam = 0;
+        }
+        if (!PeekMessageA(v4, 0, 0, 0, 0))
+            goto LABEL_5;
     }
-    (*(void(__thiscall**)(int))(*(DWORD*)v2 + 88))(v2);
-    sub_4D8EC2(v2);
-    return *(DWORD*)(v2 + 44);
+    this[9] = (HWND)((unsigned int)this[9] & 0xFFFFFFE7);
+    return this[11];
 }
 
 // sub_4D1C57 : wWinMain
