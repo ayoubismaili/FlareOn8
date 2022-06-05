@@ -17,46 +17,6 @@ BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 
-int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
-                     _In_opt_ HINSTANCE hPrevInstance,
-                     _In_ LPWSTR    lpCmdLine,
-                     _In_ int       nCmdShow)
-{
-    UNREFERENCED_PARAMETER(hPrevInstance);
-    UNREFERENCED_PARAMETER(lpCmdLine);
-
-    // TODO: Place code here.
-
-    // Initialize global strings
-    LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
-    LoadStringW(hInstance, IDC_MYAQUATICLIFE, szWindowClass, MAX_LOADSTRING);
-    MyRegisterClass(hInstance);
-
-    // Perform application initialization:
-    if (!InitInstance (hInstance, nCmdShow))
-    {
-        return FALSE;
-    }
-
-    HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_MYAQUATICLIFE));
-
-    MSG msg;
-
-    // Main message loop:
-    while (GetMessage(&msg, nullptr, 0, 0))
-    {
-        if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
-        {
-            TranslateMessage(&msg);
-            DispatchMessage(&msg);
-        }
-    }
-
-    return (int) msg.wParam;
-}
-
-
-
 //
 //  FUNCTION: MyRegisterClass()
 //
@@ -179,176 +139,168 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
     return (INT_PTR)FALSE;
 }
 
-int sub_4DA0DD()
-{
-    int result; // eax
+void sub_4BB144() {
+    //TODO: Add code
+}
 
-    result = *(_DWORD*)(sub_4DE62C() + 4);
-    if (!result)
-        return *(_DWORD*)(sub_4DE606() + 4);
-    return result;
+void sub_4DDF8E() {
+    //TODO: Add code
+}
+
+void sub_4DE68E() {
+    //TODO: Add code
+}
+
+void sub_4D5554() {
+    //TODO: Add code
+}
+
+void sub_4D5508(int val) {
+    //TODO: Add code
+}
+
+char* sub_4DF5C7(void* data) {
+    //TODO: Add code
+    return NULL;
+}
+
+int sub_4DF689(void* data) {
+    //TODO: Add code
+    return 0;
+}
+
+int sub_4D503A(HWND hWnd) {
+    //TODO: Add code
+    return 0;
 }
 
 int sub_4DE606()
 {
     int result; // eax
 
-    result = *(_DWORD*)(sub_4DF5C7(sub_4DDF8E) + 4);
+    result = *(DWORD*)(sub_4DF5C7(sub_4DDF8E) + 4);
     if (!result)
         return sub_4DF689(sub_4DE68E);
     return result;
 }
 
-unsigned __int8* __cdecl sub_4C0678(unsigned __int8* a1)
+HWND sub_4D8E88(int val) 
 {
-    unsigned __int8* result; // eax
-
-    result = a1 + 1;
-    if ((*((_BYTE*)&dword_582748[374] + *a1 + 1) & 4) != 0)
-        return a1 + 2;
-    return result;
+    //TODO: Add code
+    return NULL;
 }
 
-int __stdcall sub_4DFC02(char* a1, int a2, int a3)
+int sub_4D7997(int val) 
 {
-    char* v3; // esi
-    char* v4; // edi
-    char v5; // al
-
-    v3 = a1;
-    v4 = a1;
-    while (*v3)
-    {
-        v5 = *v3;
-        if (*v3 == 92 || v5 == 47 || v5 == 58)
-            v4 = (char*)sub_4C0678(v3);
-        v3 = (char*)sub_4C0678(v3);
-    }
-    if (!a2)
-        return lstrlen(v4) + 1;
-    lstrcpyn(a2, v4, a3);
+    //TODO: Add code
     return 0;
 }
 
-int __cdecl sub_4BE192(int a1)
+void sub_4D731F(char val) 
 {
-    int v1; // eax
-    int v2; // eax
-
-    if (a1 && (v1 = sub_4BD360(a1), (v2 = sub_4BBC99(v1 + 1)) != 0))
-        return sub_4BC9C0(v2);
-    else
-        return 0;
+    //TODO: Add code
 }
 
-int __thiscall sub_4DFAE5(int this)
+void sub_4D7ADF(int v1, int v2, int v3, int v4, int v5, int v6) 
 {
-    _DWORD* v2; // edi
-    _BYTE* v3; // eax
-    int v4; // eax
-    int result; // eax
-    _BYTE* v6; // ebx
-    CHAR v7[256]; // [esp+Ch] [ebp-30Ch] BYREF
-    CHAR Filename[260]; // [esp+10Ch] [ebp-20Ch] BYREF
-    char v9[260]; // [esp+210h] [ebp-108h] BYREF
-    _BYTE* v10; // [esp+314h] [ebp-4h]
-
-    v2 = (_DWORD*)sub_4DE606();
-    v2[2] = *(_DWORD*)(this + 104);
-    v2[3] = *(_DWORD*)(this + 104);
-    GetModuleFileNameA(*(HMODULE*)(this + 104), Filename, 0x104u);
-    v3 = (_BYTE*)sub_4C0705(Filename, 46);
-    *v3 = 0;
-    v10 = v3;
-    sub_4DFC02(Filename, v9, 260);
-    if (!*(_DWORD*)(this + 136))
-        *(_DWORD*)(this + 136) = sub_4BE192(v9);
-    if (!*(_DWORD*)(this + 120))
-    {
-        if (sub_4D951A(0xE000u, v7, 256))
-            v4 = sub_4BE192(v7);
-        else
-            v4 = sub_4BE192(*(_DWORD*)(this + 136));
-        *(_DWORD*)(this + 120) = v4;
-    }
-    result = *(_DWORD*)(this + 120);
-    v2[4] = result;
-    if (!*(_DWORD*)(this + 140))
-    {
-        v6 = v10;
-        lstrcpy(v10, aHlp);
-        result = sub_4BE192(Filename);
-        *(_DWORD*)(this + 140) = result;
-        *v6 = 0;
-    }
-    if (!*(_DWORD*)(this + 144))
-    {
-        lstrcat(v9, aIni);
-        result = sub_4BE192(v9);
-        *(_DWORD*)(this + 144) = result;
-    }
-    return result;
+    //TODO: Add code
 }
 
-int __stdcall sub_4DFA82(int a1, int a2, int a3, int a4)
+void sub_4D8EC2(int val) 
 {
-    UINT v4; // eax
-    int v5; // eax
-    _DWORD* v6; // eax
-
-    v4 = SetErrorMode(0);
-    LOWORD(v4) = v4 | 0x8001;
-    SetErrorMode(v4);
-    v5 = sub_4DE606();
-    *(_DWORD*)(v5 + 8) = a1;
-    *(_DWORD*)(v5 + 12) = a1;
-    v6 = *(_DWORD**)(sub_4DE606() + 4);
-    if (v6)
-    {
-        v6[26] = a1;
-        v6[27] = a2;
-        v6[28] = a3;
-        v6[29] = a4;
-        sub_4DFAE5(v6);
-    }
-    if (!*(_BYTE*)(sub_4DE606() + 20))
-        sub_4DA1B8();
-    return 1;
+    //TODO: Add code
 }
 
-int __stdcall sub_4DB57B(int a1, int a2, int a3, int a4)
+//Unknown Class
+typedef struct _CLASS1 {
+    DWORD val8; // dword [ a1 - 32 ]
+    DWORD val7; // dword [ a1 - 28 ]
+    DWORD val6; // dword [ a1 - 24 ]
+    HWND val5;  // dword [ a1 - 20 ]
+    int* val4;  // dword [ a1 - 16 ]
+    DWORD val3; // dword [ a1 - 12 ]
+    DWORD val2; // dword [ a1 - 8 ]
+    DWORD val1; // dword [ a1 - 4 ]
+
+} CLASS1, *PCLASS1;
+
+BOOL sub_4D8C20(CLASS1* cls, DWORD dwValue, int val, HMODULE hModule) {
+    return FALSE;
+}
+
+int sub_4D8F04(CLASS1* a1, unsigned int ecx)
 {
-    int v4; // ebx
-    _DWORD* v5; // esi
-    int v6; // edi
-    int v7; // ecx
+    a1 -= 1;
+
+    int v1 = ecx; // ecx
+    int v2; // esi
+    HGLOBAL Resource; // edi
+    HMODULE v4; // ebx
+    HRSRC ResourceA; // eax
+    bool v7; // zf
     int v8; // eax
+    char v9; // bl
+    int v10; // [esp-24h] [ebp-24h] BYREF
 
-    v4 = -1;
-    v5 = (_DWORD*)sub_4DA0DD();
-    v6 = *(_DWORD*)(sub_4DE606() + 4);
-    if (sub_4DFA82(a1, a2, a3, a4) && (!v6 || (*(int(__thiscall**)(int))(*(_DWORD*)v6 + 132))(v6)))
+    sub_4BB144();
+    v2 = v1;
+    a1->val4 = &v10;
+    a1->val7 = v1;
+    Resource = *(HGLOBAL*)(v1 + 68);
+    a1->val6 = *(DWORD*)(v1 + 72);
+    v4 = *(HMODULE*)(sub_4DE606() + 12);
+    if (*(DWORD*)(v2 + 64))
     {
-        if ((*(int(__thiscall**)(_DWORD*))(*v5 + 80))(v5))
-        {
-            v8 = (*(int(__thiscall**)(_DWORD*))(*v5 + 84))(v5);
-        }
-        else
-        {
-            v7 = v5[7];
-            if (v7)
-                (*(void(__thiscall**)(int))(*(_DWORD*)v7 + 88))(v7);
-            v8 = (*(int(__thiscall**)(_DWORD*))(*v5 + 104))(v5);
-        }
-        v4 = v8;
+        v4 = *(HMODULE*)(sub_4DE606() + 12);
+        ResourceA = FindResourceA(v4, *(LPCSTR*)(v2 + 64), RT_DIALOG);
+        Resource = LoadResource(v4, ResourceA);
     }
-    sub_4E23B5();
-    return v4;
+    if (Resource)
+        a1->val6 = (DWORD)LockResource(Resource);
+    if (!a1->val6)
+        return -1;
+    a1->val5 = sub_4D8E88(v2);
+    sub_4D5554();
+    v7 = a1->val5 == 0;
+    a1->val8 = 0;
+    if (!v7 && IsWindowEnabled(a1->val5))
+    {
+        EnableWindow(a1->val5, FALSE);
+        a1->val8 = 1;
+    }
+    a1->val1 = 0;
+    sub_4D5508(v2);
+    v8 = sub_4D503A(a1->val5);
+    if (sub_4D8C20(a1, a1->val6, v8, v4))
+    {
+        if ((*(BYTE*)(v2 + 36) & 0x10) != 0)
+        {
+            v9 = 4;
+            if ((sub_4D7997(v2) & 0x100) != 0)
+                v9 = 5;
+            sub_4D731F(v9);
+        }
+        if (*(DWORD*)(v2 + 28))
+            sub_4D7ADF(0, 0, 0, 0, 0, 0x97u);
+    }
+    a1->val1 = -1;
+    if (a1->val8)
+        EnableWindow(a1->val5, TRUE);
+    if (a1->val5)
+    {
+        if (GetActiveWindow() == *(HWND*)(v2 + 28))
+            SetActiveWindow(a1->val5);
+    }
+    (*(void(__thiscall**)(int))(*(DWORD*)v2 + 88))(v2);
+    sub_4D8EC2(v2);
+    return *(DWORD*)(v2 + 44);
 }
 
-int __stdcall sub_4D1C57(int a1, int a2, int a3, int a4)
+// sub_4D1C57 : wWinMain
+int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
+    _In_opt_ HINSTANCE hPrevInstance,
+    _In_ LPWSTR    lpCmdLine,
+    _In_ int       nCmdShow)
 {
-    return sub_4DB57B(a1, a2, a3, a4);
+    return 0;
 }
-
-
