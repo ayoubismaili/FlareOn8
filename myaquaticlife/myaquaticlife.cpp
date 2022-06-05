@@ -139,7 +139,72 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
     return (INT_PTR)FALSE;
 }
 
-HWND __thiscall sub_4D731F(HWND* this, char a2)
+typedef struct {
+    DWORD val1; // dword 0
+    DWORD val2; // dword 4
+    DWORD val3; // dword 8
+    DWORD val4; // dword 12
+    DWORD val5; // dword 16
+    DWORD val6; // dword 20
+    DWORD val7; // dword 24
+    HWND val8; // dword 28
+    DWORD val9; // dword 32
+    DWORD val10; // dword 36
+    DWORD val11; // dword 40
+    DWORD val12; // dword 44
+    DWORD val13; // dword 48
+    DWORD val14; // dword 52
+    Aqua_Class2* val15; // dword 56
+
+} Aqua_Class1, *PAqua_Class1;
+
+typedef struct {
+    DWORD val1; // dword 0
+    DWORD val2; // dword 4
+    DWORD val3; // dword 8
+    DWORD val4; // dword 12
+    DWORD val5; // dword 16
+    DWORD val6; // dword 20
+    DWORD val7; // dword 24
+    DWORD val8; // dword 28
+    DWORD val9; // dword 32
+    DWORD val10; // dword 36
+    DWORD val11; // dword 40
+    DWORD val12; // dword 44
+    DWORD val13; // dword 48
+    DWORD val14; // dword 52
+    DWORD val15; // dword 56
+    DWORD val16; // dword 60
+    DWORD val17; // dword 64
+    DWORD val18; // dword 68
+    DWORD val19; // dword 72
+    DWORD val20; // dword 76
+    DWORD val21; // dword 80
+    DWORD val22; // dword 84
+    DWORD val23; // dword 88
+    DWORD val24; // dword 92
+    DWORD val25; // dword 96
+    DWORD val26; // dword 100
+    DWORD val27; // dword 104
+    DWORD val28; // dword 108
+    int((*val29))(Aqua_Class2*); // dword 112
+
+} Aqua_Class2, * PAqua_Class2;
+
+// sub_4D7997 : Aqua_Class1_Method2
+LONG sub_4D7997(Aqua_Class1* _this)
+{
+    Aqua_Class2* v1; // eax
+
+    v1 = _this->val15;
+    if (v1)
+        return v1->val29(_this->val15);
+    else
+        return GetWindowLongA(_this->val8, GWL_STYLE);
+}
+
+// sub_4D731F : Aqua_Class1_MessageLoop
+HWND __thiscall Aqua_Class1_MessageLoop(HWND* _this, char a2)
 {
     HWND Parent; // eax
     struct tagMSG* v4; // ebp
@@ -154,10 +219,10 @@ HWND __thiscall sub_4D731F(HWND* this, char a2)
 
     v12 = 1;
     lParam = 0;
-    if ((a2 & 4) == 0 || (v10 = 1, (sub_4D7997(this) & 0x10000000) != 0))
+    if ((a2 & 4) == 0 || (v10 = 1, (sub_4D7997(_this) & 0x10000000) != 0))
         v10 = 0;
-    Parent = GetParent(this[7]);
-    this[9] = (HWND)((unsigned int)this[9] | 0x18);
+    Parent = GetParent(_this[7]);
+    _this[9] = (HWND)((unsigned int)_this[9] | 0x18);
     hWnd = Parent;
     v4 = (struct tagMSG*)(sub_4DA0DD() + 48);
 LABEL_5:
@@ -166,15 +231,15 @@ LABEL_5:
         if (v10)
         {
             sub_4D7B2E(1);
-            UpdateWindow(this[7]);
+            UpdateWindow(_this[7]);
             v10 = 0;
         }
         if ((a2 & 1) == 0 && hWnd && !lParam)
-            SendMessageA(hWnd, 0x121u, 0, (LPARAM)this[7]);
+            SendMessageA(hWnd, 0x121u, 0, (LPARAM)_this[7]);
         if ((a2 & 2) == 0)
         {
             v5 = lParam++;
-            if (SendMessageA(this[7], 0x36Au, 0, v5))
+            if (SendMessageA(_this[7], 0x36Au, 0, v5))
                 continue;
         }
         v12 = 0;
@@ -193,11 +258,11 @@ LABEL_5:
             if (message == 280 || message == 260)
             {
                 sub_4D7B2E(1);
-                UpdateWindow(this[7]);
+                UpdateWindow(_this[7]);
                 v10 = 0;
             }
         }
-        if (!(*((int(__thiscall**)(HWND*)) * this + 28))(this))
+        if (!(*((int(__thiscall**)(HWND*)) * _this + 28))(_this))
             break;
         v8 = sub_4DA0DD();
         if ((*(int(__thiscall**)(int, struct tagMSG*))(*(_DWORD*)v8 + 100))(v8, v4))
@@ -208,8 +273,8 @@ LABEL_5:
         if (!PeekMessageA(v4, 0, 0, 0, 0))
             goto LABEL_5;
     }
-    this[9] = (HWND)((unsigned int)this[9] & 0xFFFFFFE7);
-    return this[11];
+    _this[9] = (HWND)((unsigned int)_this[9] & 0xFFFFFFE7);
+    return _this[11];
 }
 
 // sub_4D1C57 : wWinMain
