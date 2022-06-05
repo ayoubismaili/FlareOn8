@@ -192,7 +192,7 @@ typedef struct {
 } Aqua_Class2, * PAqua_Class2;
 
 // sub_4D7997 : Aqua_Class1_Method2
-LONG sub_4D7997(Aqua_Class1* _this)
+LONG Aqua_Class1_Method2(Aqua_Class1* _this)
 {
     Aqua_Class2* v1; // eax
 
@@ -204,7 +204,7 @@ LONG sub_4D7997(Aqua_Class1* _this)
 }
 
 // sub_4D731F : Aqua_Class1_MessageLoop
-HWND __thiscall Aqua_Class1_MessageLoop(HWND* _this, char a2)
+DWORD Aqua_Class1_MessageLoop(Aqua_Class1* _this, char a2)
 {
     HWND Parent; // eax
     struct tagMSG* v4; // ebp
@@ -219,53 +219,53 @@ HWND __thiscall Aqua_Class1_MessageLoop(HWND* _this, char a2)
 
     v12 = 1;
     lParam = 0;
-    if ((a2 & 4) == 0 || (v10 = 1, (sub_4D7997(_this) & 0x10000000) != 0))
+    if ((a2 & 4) == 0 || (v10 = 1, (Aqua_Class1_Method2(_this) & 0x10000000) != 0))
         v10 = 0;
-    Parent = GetParent(_this[7]);
-    _this[9] = (HWND)((unsigned int)_this[9] | 0x18);
+    Parent = GetParent(_this->val8);
+    _this->val10 = (_this->val10 | 0x18);
     hWnd = Parent;
-    v4 = (struct tagMSG*)(sub_4DA0DD() + 48);
+    //v4 = (struct tagMSG*)(sub_4DA0DD() + 48);
 LABEL_5:
     while (v12 && !PeekMessageA(v4, 0, 0, 0, 0))
     {
         if (v10)
         {
-            sub_4D7B2E(1);
-            UpdateWindow(_this[7]);
+            //sub_4D7B2E(1);
+            UpdateWindow(_this->val8);
             v10 = 0;
         }
         if ((a2 & 1) == 0 && hWnd && !lParam)
-            SendMessageA(hWnd, 0x121u, 0, (LPARAM)_this[7]);
+            SendMessageA(hWnd, WM_ENTERIDLE, MSGF_DIALOGBOX, (LPARAM)_this->val8);
         if ((a2 & 2) == 0)
         {
             v5 = lParam++;
-            if (SendMessageA(_this[7], 0x36Au, 0, v5))
+            if (SendMessageA(_this->val8, 0x36Au, 0, v5))
                 continue;
         }
         v12 = 0;
     }
     while (1)
     {
-        v6 = sub_4DA0DD();
-        if (!(*(int(__thiscall**)(int))(*(_DWORD*)v6 + 92))(v6))
+        //v6 = sub_4DA0DD();
+        if (!(*(int(__thiscall**)(int))(*(DWORD*)v6 + 92))(v6))
         {
-            sub_4E22EB(0);
-            return HWND_MESSAGE | 0x2;
+            //sub_4E22EB(0);
+            //return HWND_MESSAGE | 0x2;
         }
         if (v10)
         {
             message = v4->message;
             if (message == 280 || message == 260)
             {
-                sub_4D7B2E(1);
-                UpdateWindow(_this[7]);
+                //sub_4D7B2E(1);
+                UpdateWindow(_this->val8);
                 v10 = 0;
             }
         }
-        if (!(*((int(__thiscall**)(HWND*)) * _this + 28))(_this))
-            break;
-        v8 = sub_4DA0DD();
-        if ((*(int(__thiscall**)(int, struct tagMSG*))(*(_DWORD*)v8 + 100))(v8, v4))
+        //if (!(*((int(__thiscall**)(HWND*)) * _this + 28))(_this))
+        //    break;
+        //v8 = sub_4DA0DD();
+        if ((*(int(__thiscall**)(int, struct tagMSG*))(*(DWORD*)v8 + 100))(v8, v4))
         {
             v12 = 1;
             lParam = 0;
@@ -273,8 +273,8 @@ LABEL_5:
         if (!PeekMessageA(v4, 0, 0, 0, 0))
             goto LABEL_5;
     }
-    _this[9] = (HWND)((unsigned int)_this[9] & 0xFFFFFFE7);
-    return _this[11];
+    _this->val10 = (_this->val10 & 0xFFFFFFE7);
+    return _this->val12;
 }
 
 // sub_4D1C57 : wWinMain
